@@ -1,7 +1,6 @@
 """
     view file
 """
-
 # django import
 from django.http import HttpResponse
 from django.conf import settings
@@ -35,5 +34,8 @@ def ms_login(request):
         # print(json_response)
 
     return HttpResponse("Hey, Login Successfully")
+
+
+
 
 

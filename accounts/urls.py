@@ -1,9 +1,9 @@
 from django.urls import path
 from accounts import views
-from rest_framework.routers import DefaultRouter
+# from rest_framework.routers import DefaultRouter
 
-router = DefaultRouter()
-router.register('user', views.JiraItem, basename='user')
+# router = DefaultRouter()
+# router.register('user', views.JiraItem, basename='user')
 
 urlpatterns = [
     # path('', views.ms_login)
@@ -14,5 +14,6 @@ urlpatterns = [
     # path('callback', views.callback, name='callback'),
     # path('login', Login.as_view()),
     # path('aut', Authorize.as_view()),
+]
 
-]+router.urls
+# ]+router.urls
