@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts',
-    'django_auth_adfs',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +53,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'django_auth_adfs.middleware.LoginRequiredMiddleware'
 ]
 
 ROOT_URLCONF = 'reporting_tool.urls'
@@ -85,9 +83,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
+    }
     # 'default': {
-    #     'ENGINE': "django.db.backends.postgresql",
+    #     'ENGINE': "django.db.backends.mysql",
     #     'NAME': os.getenv('DB_NAME'),  # database name
     #     'USER': os.getenv('DB_USERNAME'),  # database username
     #     'PASSWORD': os.getenv('DB_PASSWORD'),  # database password

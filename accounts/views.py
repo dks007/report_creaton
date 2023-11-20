@@ -4,13 +4,8 @@
 
 # django import
 from django.http import HttpResponse
-from django.contrib.auth.models import User
-from rest_framework import generics, viewsets
 from django.conf import settings
 import requests
-from rest_framework.response import Response
-
-from accounts.serializers import UserSerializer
 
 
 def get_graph_token():
@@ -28,10 +23,8 @@ def get_graph_token():
 
 def ms_login(request):
     graph_token = get_graph_token()
-    print(request.user, ">>>>>>>>>>>>")
     if graph_token:
         url = 'https://graph.microsoft.com/v1.0/users/' + request.user.username
-        print(url)
         headers = {
             'Authorization': 'Bearer ' + graph_token['access_token'],
             'Content-type': 'application/json'
@@ -43,25 +36,4 @@ def ms_login(request):
 
     return HttpResponse("Hey, Login Successfully")
 
-
-class JiraItem(viewsets.GenericViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def get_object(self):
-        return User.objects.filter(id=self.kwargs['pk']).first()
-
-    def get_queryset(self):
-        return User.objects.all()
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response({'data': serializer.data})
-
-    def retrieve(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer(user)
-        return Response({"User": serializer.data})
 

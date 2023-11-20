@@ -3,12 +3,14 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+import os
 
 def jira():
     url = "https://dsklocal.atlassian.net/rest/api/2/events"
-    to = "ATATT3xFfGF0WfP3Y8T7h2hbqpXAlogMNENL-QvKeL5O5kLXnhNc9UGZLYolR6Inat3HOE_wy1Wx_LhvU-xyVG_4oEs4R3_3cpe2FTduvpKenzUnuMNd4K65tyFAY08-gKDsXovOiy5Ako154-3fgFQ1JTjMG1bwx7nB9tiRuvS8hdLIGjx5wdU=4E400EA8"
+    token = os.getenv("TOKEN")
+    email = os.getenv("EMAIL")
 
-    auth = HTTPBasicAuth('dilip.ku.007@gmail.com', to)
+    auth = HTTPBasicAuth(email, token)
 
     headers = {
         "Accept": "application/json",
