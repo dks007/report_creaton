@@ -1,0 +1,39 @@
+version: '3'  
+services:  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - .:/usr/src/app
+    depends_on:
+      - web
+  web:
+    build: .
+    container_name: django
+    restart: always
+    command: bash -c "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn zod_bank.wsgi -b 0.0.0.0:8000 -t 300 --log-level=info"
+    volumes:
+      - .:/usr/src/app
+
+  broker:
+    image: rabbitmq:3.7
+    container_name: rabbitmq
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 5673:5673
+
+  worker:
+    build: .
+    image: celery
+    container_name: dev_celery
+    restart: "always"
+    command: bash -c " celery -A zod_bank.celery worker --concurrency=1 -B -l DEBUG -E"
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - broker
