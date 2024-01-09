@@ -94,7 +94,7 @@ def data():
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    url = "https://ifsdev.atlassian.net/rest/api/3/search"
+    url = "url from env"
     auth = HTTPBasicAuth('username', 'password')
     # cutome fields names
     # customfield_16032 => customer contact
