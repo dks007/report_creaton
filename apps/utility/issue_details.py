@@ -130,8 +130,7 @@ def specific_data(iss_id):
     }
 
     url = "https://ifsdev.atlassian.net/rest/api/3/search"
-    auth = HTTPBasicAuth("dilip.kumar.shrivastwa@ifs.com",
-                         "ATATT3xFfGF0p-FG8-lj6HsWs80g3AtzRePPZ4WDbZEq_ZlDJoEVV3zcusdMdiyGxn1do8ldFe4Tgy4OcC2gOc9yArvRSzZ24z13JqWPxKsJvvinVybUIwYdlnla8QErcuYl0XnMBvLc_Fn_sk2TntBf1Rj4DZ-hkL5FOr4xu5kDo9M2rna2vEQ=B3F4BE74")
+    auth = HTTPBasicAuth('username', 'password')
     # cutome fields names
     # customfield_16032 => customer contact
     # customfield_16015 => start date

@@ -17,9 +17,9 @@ class CustomerMapping(models.Model):
     industry_id = models.ForeignKey('IndustryMaster', on_delete=models.SET_NULL, null=True)
     success_elements_id = models.ForeignKey('SuccessElementsMaster', on_delete=models.SET_NULL, null=True)
     description = models.TextField(null=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True, null=False)
-    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by_user')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by_user', null=True, blank=True)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
     status = models.CharField(max_length=255, null=True)
 
@@ -115,7 +115,7 @@ class SuccessServiceMaster(models.Model):
 class ProjectMaster(models.Model):
     id = models.AutoField(primary_key=True)
     project_name = models.CharField(max_length=255, null=False)
-    project_logo_id = models.IntegerField(null=True)
+    project_logo_id = models.IntegerField(null=True, blank=True)
     created_by = models.CharField(max_length=255, null=False)
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)

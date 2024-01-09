@@ -55,7 +55,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class CapabilityViewSet(viewsets.ModelViewSet):
-
     queryset = CapabilityMaster.objects.all()
     serializer_class = CapabilitySerializer
 
@@ -68,7 +67,6 @@ class CapabilityViewSet(viewsets.ModelViewSet):
 
 
 class SubCapabilityViewSet(viewsets.ModelViewSet):
-
     queryset = SubCapabilityMaster.objects.all()
     serializer_class = SubCapabilitySerializer
 
@@ -86,10 +84,4 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
 
 
 class IssueViewSet(viewsets.ModelViewSet):
-
-    def list(self, request, *args, **kwargs):
-        response = data()
-        # response = json.loads(response)
-        serializer = self.serializer_class(response, many=True)
-        print(serializer, '>>>>>>>>>>')
-        return Response({"a":'a'})
+    pass

@@ -2,7 +2,8 @@
 from django.contrib import admin
 from apps.dashboard.models.masters import (SdoMaster, PSMMaster, CSMMaster, SDMMaster, IndustryMaster, RegionMaster,
                                            SuccessElementsMaster, SuccessServiceMaster, CustomerMaster,
-                                           CapabilityMaster, SubCapabilityMaster, ProjectMaster, MenuSdoMapping)
+                                           CapabilityMaster, SubCapabilityMaster, ProjectMaster, MenuSdoMapping,
+                                           CustomerMapping)
 
 
 admin.site.register(SdoMaster)
@@ -18,3 +19,4 @@ admin.site.register(CapabilityMaster)
 admin.site.register(SubCapabilityMaster)
 admin.site.register(ProjectMaster)
 admin.site.register(MenuSdoMapping)
+admin.site.register(CustomerMapping)

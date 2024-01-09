@@ -20,8 +20,8 @@ mysql_config = {
 
 # Excel file path and sheet name
 excel_file_path = '/home/rafique/Desktop/reporting/apps/utility/data_mapping_1.xlsx'
-sheet_name = 'menu_cards'
-table_name = 'dashboard_menucardmaster'
+sheet_name = 'customer_project'
+table_name = 'dashboard_projectmaster'
 
 # Connect to MySQL
 conn = mysql.connector.connect(**mysql_config)
@@ -35,24 +35,24 @@ for index, row in df.iterrows():
     # print(index, " >>>> ", row[0])
     # success_service_name = row[5]  # row index need to insert
     # customer_id = row[3] #if len(row) > 2 and row[2] is not None else 'NA'
-    menu_card = row[0]
-    menu_description = row[1]
-    template_file_name = row[2]
-    template_file_path = 'file_path'
-    template_file_type = 'xlsx'
-    template_file_size = 1
+    project_name = row[3]
+    # menu_description = row[1]
+    # template_file_name = row[2]
+    # template_file_path = 'file_path'
+    # template_file_type = 'xlsx'
+    # template_file_size = 1
 
     # print(industry_type_name, '>>>>>>>>>', industry_description)
 
-    if menu_card is None or menu_card == '':
+    if project_name is None or project_name == '':
         continue
 
 
     # Assuming your table has columns named col1, col2, col3
-    sql = f"INSERT INTO {table_name} (menu_card, menu_description, template_file_name, template_file_path, template_file_type, template_file_size, created_date, updated_date, status) VALUES (%s, %s, %s, %s, %s, %s, CURDATE(), CURDATE(), 1)"
+    sql = f"INSERT INTO {table_name} (project_name, created_by, created_date, updated_by, updated_date, status) VALUES (%s, 1, CURDATE(), 1, CURDATE(), 1)"
 
     try:
-        cursor.execute(sql, (menu_card, menu_description, template_file_name, template_file_path, template_file_type, template_file_size))
+        cursor.execute(sql, (project_name,))
         conn.commit()
         print("Record inserted successfully")
     except mysql.connector.Error as err:
