@@ -87,26 +87,60 @@ def find_menuid_in_string(match_str):
     return None, False
 
 
-def issue_list_data():
+def data():
     MAX_DURATION_SECONDS = 60
     start_time = time.time()
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    url = os.getenv('JIRA_URL')
-    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
+    url = "https://ifsdev.atlassian.net/rest/api/3/search"
+    auth = HTTPBasicAuth('username', 'password')
+    # cutome fields names
+    # customfield_16032 => customer contact
+    # customfield_16015 => start date
+    # customfield_16036 => Activit Short name
+    # customfield_16262 => Customer email
+    # customfield_16263 => customer contact number
+    # customfield_16264 => custome region/location
+    # customfield_16265 => SNow Request Item No
+    # set the initial parameters
+    # Specify the start and end parameters
     start_at = 0
     end_at = 24  # Fetching 25 records (0-based index)
+
     payload = {
-        "jql": "order by created DESC",
+        "expand": [
+            "changelog"
+        ],
+        "jql": "issuetype in (Sub-task, Tasks) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') AND 'Service Category[Dropdown]' = 'Expert Services' AND assignee NOT in (EMPTY) order by created DESC",
         "fieldsByKeys": False,
-        "maxResults": 10,
+        "fields": [
+            "summary",
+            "description",
+            "project",
+            "customfield_16032",
+            "customfield_16015",
+            "customfield_16036",
+            "customfield_16262",
+            "customfield_16263",
+            "customfield_16264",
+            "customfield_16265",
+            "assignee",
+            "issuetype",
+            "status",
+            "parent",
+            "created",
+            "creator",
+            "subtask",
+            "comment"
+        ],
+        "maxResults": 25,
         "startAt": 0
     }
     # Initialize an empty list to store the extracted data
     data_list = []
-    payload['maxResults'] = 10
+    payload['maxResults'] = 25
 
     payload['startAt'] = start_at
     response = requests.request(
@@ -117,6 +151,7 @@ def issue_list_data():
         data=json.dumps(payload),
         verify=False
     )
+
     # check if the request response was successful
     if response.status_code == 200:
         issues_data = json.loads(response.text)
@@ -144,8 +179,7 @@ def issue_list_data():
             issue_key = issue.get("key", "")
             created = issue["fields"].get('created', "")
             created = convert_date(created)
-            # activity_short_name = issue["fields"].get("customfield_16036", "")
-            activity_short_name = issue["fields"].get("customfield_10032", "")
+            activity_short_name = issue["fields"].get("customfield_16036", "")
             if activity_short_name and '.' in activity_short_name:
                 activity_split_string = activity_short_name.split('.')
                 # getting activity project id
@@ -173,9 +207,8 @@ def issue_list_data():
             customer_id = project_key[2:]
             customer_email = issue["fields"].get("customfield_16262", "")
             customer_contact_no = issue["fields"].get("customfield_16263", "")
-            # customer_location = issue["fields"]["customfield_16264"].get("value", "") if issue["fields"][
-            #     "customfield_16264"] else None
-            customer_location = None
+            customer_location = issue["fields"]["customfield_16264"].get("value", "") if issue["fields"][
+                "customfield_16264"] else None
             customer_contact = issue["fields"].get("customfield_16032", "")
             snow_request_no = issue["fields"].get("customfield_16265", "")
             parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
@@ -185,15 +218,14 @@ def issue_list_data():
 
             subtask = issue["fields"]["issuetype"].get("subtask", "")
 
-            # assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue[
-            #     "fields"] else None
-            assignee_name = None
-            # assignee_email = issue["fields"]["assignee"].get("emailAddress", "") if "assignee" in issue[
-            #     "fields"] else None
-            # assignee_id = issue["fields"]["assignee"].get("accountId", "") if "assignee" in issue[
-            #     "fields"] else None
+            assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue[
+                "fields"] else None
+            assignee_email = issue["fields"]["assignee"].get("emailAddress", "") if "assignee" in issue[
+                "fields"] else None
+            assignee_id = issue["fields"]["assignee"].get("accountId", "") if "assignee" in issue[
+                "fields"] else None
 
-            # issue_status = issue["fields"]["status"].get("name", "")
+            issue_status = issue["fields"]["status"].get("name", "")
 
             # Create an Issue instance
             issue_fields = {
@@ -224,7 +256,7 @@ def issue_list_data():
                 # "assignee_email": assignee_email,
                 "assignee_name": assignee_name,
                 # "assignee_id": assignee_id,
-                "issue_status": 'issue_status'
+                "issue_status": issue_status
             }
 
             # Save the instance to the csv
