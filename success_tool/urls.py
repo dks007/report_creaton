@@ -19,25 +19,25 @@ from django.urls import path, include
 from djangosaml2.views import LoginView, LogoutView
 
 
-# from rest_framework import permissions
-# from drf_yasg.views import get_schema_view
-# from drf_yasg import openapi
-#
-# schema_view = get_schema_view(
-#     openapi.Info(
-#         title="Reporting Automation",
-#         default_version='v1',
-#         description="Reporting Automation",
-#         terms_of_service="https://yourapp.com/terms/",
-#         contact=openapi.Contact(email="contact@yourapp.com"),
-#         license=openapi.License(name="Your License"),
-#     ),
-#     public=True,
-#     permission_classes=(permissions.AllowAny,),
-# )
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Reporting Automation",
+        default_version='v1',
+        description="Reporting Automation",
+        terms_of_service="https://yourapp.com/terms/",
+        contact=openapi.Contact(email="contact@yourapp.com"),
+        license=openapi.License(name="Your License"),
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0)),
     path('api/', include('apps.dashboard.urls')),
     path('sso/login/', LoginView.as_view(), name='saml_login'),
     path('sso/logout/', LogoutView.as_view(), name='saml_logout'),

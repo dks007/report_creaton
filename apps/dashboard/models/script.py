@@ -59,5 +59,8 @@ def insert_details():
     return True
 
 
-test = insert_details()
-print(test)
+# test = insert_details()
+# print(test)
+def abc():
+    print(os.getenv('JIRA_URL'))
+abc()

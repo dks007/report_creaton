@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 import saml2
@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$@kuntxzv9c#c(h&&95@$m&j#j!y6za2u=v-__9@@iv2apl047'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -82,11 +82,11 @@ WSGI_APPLICATION = 'success_tool.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ifsreporting_local',
-        'USER': 'root',
-        'PASSWORD': 'test',
-        'HOST': 'localhost',  # Replace with your MySQL server host if it's not local
-        'PORT': '5432',  # Replace with your MySQL server port if it's not the default
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USERNAME'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),  # Replace with your MySQL server host if it's not local
+        'PORT': os.getenv('DB_PORT'),  # Replace with your MySQL server port if it's not the default
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -147,6 +147,68 @@ REST_FRAMEWORK = {
 
 }
 
+# cors-configuration
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'expires',
+    'pragma',
+    'cache-control'
+)
+
+CORS_EXPOSE_HEADERS = (
+    'Access-Control-Allow-Origin: *',
+)
+# cor-s-configuration
+
+# for HTTPS settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# SWAGGER-CONFIGURATION
+SWAGGER_SETTINGS = {
+    "exclude_namespaces": [],
+    "api_version": '0.1',
+    "api_path": "/",
+    "enabled_methods": [
+        'get',
+        'post',
+        'put',
+        'patch',
+        'delete'
+    ],
+    "api_key": '',
+    "is_authenticated": True,
+    "is_superuser": False,
+
+    'SECURITY_DEFINITIONS': {
+        "api_key": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        },
+    },
+}
+
+
 # custom authentication backend
 AUTHENTICATION_CLASSES = [
     'account.backends.AzureADAuthentication',
@@ -185,3 +247,6 @@ SAML_CONFIG = {
         },
     },
 }
+
+
+

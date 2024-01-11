@@ -72,12 +72,6 @@ def format_date(input_date, input_format="%Y-%m-%dT%H:%M:%S.%f%z"):
 def find_menuid_in_string(match_str):
     menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
     # need to fetch from database dashboard_menusdo
-    menuList1 = ['QSM1', 'QSM2', 'QSM3', 'QSM4', 'QSM5', 'QSM6', 'QSM7', 'QSM8', 'QSM9', 'QSM10', 'QSM11', 'QSM12',
-                'SAA1', 'SAA2', 'SAA3', 'SAA4', 'SAA5', 'SAA6', 'SAA7', 'SAA8', 'SAA9', 'SAA10', 'SAA11', 'SAA12',
-                'SAA13',
-                'SAA14', 'SAA15', 'TAA1', 'TAA2', 'TAA3', 'TAA4', 'TAA5', 'TAA6', 'TAA7', 'TAA8', 'EMA1', 'EMA2',
-                'EMA3',
-                'EMA4', 'EMA5', 'EMA6', 'EMA7', 'EMA8', 'EMA9', 'EMA10', 'EMA11', 'EMA12', 'EMA13', 'EMA14']
     matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
     longest_matching_value = ''
     p_is_after_match = ''
@@ -92,7 +86,7 @@ def find_menuid_in_string(match_str):
     return None, False
 
 
-def specific_data(iss_id):
+def issue_details_data(iss_id):
     MAX_DURATION_SECONDS = 60
 
     # issueId = 1990817
@@ -129,8 +123,8 @@ def specific_data(iss_id):
         "Content-Type": "application/json"
     }
 
-    url = "https://ifsdev.atlassian.net/rest/api/3/search"
-    auth = HTTPBasicAuth('username', 'password')
+    url = os.getenv('JIRA_URL')
+    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
     # cutome fields names
     # customfield_16032 => customer contact
     # customfield_16015 => start date
