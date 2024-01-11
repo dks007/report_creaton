@@ -87,7 +87,7 @@ def find_menuid_in_string(match_str):
     return None, False
 
 
-def data():
+def issue_list_data():
     MAX_DURATION_SECONDS = 60
     start_time = time.time()
     headers = {
