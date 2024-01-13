@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.db import models
  
-
+# customer mapping table
 class CustomerMapping(models.Model):
     id = models.BigAutoField(primary_key=True)
     customer_id = models.ForeignKey('CustomerMaster', on_delete=models.CASCADE)
@@ -26,7 +26,7 @@ class CustomerMapping(models.Model):
     def __str__(self):
         return f"CustomerMapping {self.id} - {self.customer_id.customer_name} - {self.project_id.project_name}"
 
-
+# csm master 
 class CSMMaster(models.Model):
     id = models.AutoField(primary_key=True)
     csm_name = models.CharField(max_length=255, null=False)
@@ -37,7 +37,7 @@ class CSMMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# sdm master
 class SDMMaster(models.Model):
     id = models.AutoField(primary_key=True)
     sdm_name = models.CharField(max_length=255, null=False)
@@ -48,7 +48,7 @@ class SDMMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# psm master
 class PSMMaster(models.Model):
     id = models.AutoField(primary_key=True)
     psm_name = models.CharField(max_length=255, null=False)
@@ -59,7 +59,7 @@ class PSMMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# industry master
 class IndustryMaster(models.Model):
     id = models.AutoField(primary_key=True)
     industry_type_name = models.CharField(max_length=255, null=False)
@@ -70,7 +70,7 @@ class IndustryMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# Region master
 class RegionMaster(models.Model):
     id = models.AutoField(primary_key=True)
     region_name = models.CharField(max_length=255, null=False)
@@ -80,7 +80,7 @@ class RegionMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# customer master
 class CustomerMaster(models.Model):
     id = models.AutoField(primary_key=True)
     customer_id = models.CharField(max_length=255, null=False)
@@ -91,7 +91,7 @@ class CustomerMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# success element master
 class SuccessElementsMaster(models.Model):
     id = models.AutoField(primary_key=True)
     success_element_name = models.CharField(max_length=255, null=False)
@@ -101,7 +101,7 @@ class SuccessElementsMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# success service master
 class SuccessServiceMaster(models.Model):
     id = models.AutoField(primary_key=True)
     success_service_name = models.CharField(max_length=255, null=False)
@@ -111,7 +111,7 @@ class SuccessServiceMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# project master
 class ProjectMaster(models.Model):
     id = models.AutoField(primary_key=True)
     project_name = models.CharField(max_length=255, null=False)
@@ -122,7 +122,7 @@ class ProjectMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# menu card master
 class MenuCardMaster(models.Model):
     id = models.AutoField(primary_key=True)
     menu_card = models.CharField(max_length=10, null=False)
@@ -140,7 +140,7 @@ class MenuCardMaster(models.Model):
     def __str__(self):
         return f"MenuCardMaster {self.id} - {self.menu_card}"
 
-
+# sdo master
 class SdoMaster(models.Model):
     # id = models.AutoField(primary_key=True)
     sdo_name = models.CharField(max_length=255, null=False)
@@ -154,7 +154,7 @@ class SdoMaster(models.Model):
     def __str__(self):
         return f"SdoMaster - {self.sdo_name}"
 
-
+# menu sdo mapping
 class MenuSdoMapping(models.Model):
     id = models.AutoField(primary_key=True)
 
@@ -165,7 +165,7 @@ class MenuSdoMapping(models.Model):
     def __str__(self):
         return f"MenuSdoMapping {self.id} - MenuCard: {self.menu_card_id.menu_card}, Sdo: {self.sdo_id.sdo_name}"
 
-
+# expert master
 class ExpertMaster(models.Model):
     id = models.AutoField(primary_key=True)
     expert_account_id = models.CharField(max_length=255, null=False)
@@ -180,7 +180,7 @@ class ExpertMaster(models.Model):
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
 
-
+# creator master
 class CreatorMaster(models.Model):
     id = models.AutoField(primary_key=True)
     creator_account_id = models.CharField(max_length=255, null=False)
@@ -195,7 +195,7 @@ class CreatorMaster(models.Model):
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
 
-
+# Logo master
 class LogoMaster(models.Model):
     id = models.AutoField(primary_key=True)
     logo_file_name = models.CharField(max_length=8, null=False)
@@ -212,7 +212,7 @@ class LogoMaster(models.Model):
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"
 
-
+# status master
 class StatusMaster(models.Model):
     id = models.AutoField(primary_key=True)
     status_name = models.CharField(max_length=255, null=False)
@@ -225,7 +225,7 @@ class StatusMaster(models.Model):
     def __str__(self):
         return f"StatusMaster {self.id} - {self.status_name}"
 
-
+# Report status master
 class ReportStatusMaster(models.Model):
     id = models.AutoField(primary_key=True)
     report_status_name = models.CharField(max_length=255, null=False)
@@ -238,7 +238,7 @@ class ReportStatusMaster(models.Model):
     def __str__(self):
         return f"ReportStatusMaster {self.id} - {self.report_status_name}"
 
-
+# success report table
 class SuccessReport(models.Model):
     id = models.AutoField(primary_key=True)
     jira_key = models.CharField(max_length=100, null=False)
@@ -268,7 +268,7 @@ class SuccessReport(models.Model):
     def __str__(self):
         return f"SuccessReport {self.id} - Jira Key: {self.jira_key}, Customer: {self.customer_id.customer_name}, Expert: {self.expert_id.expert_name}"
 
-
+# Product master
 class ProductMaster(models.Model):
     id = models.AutoField(primary_key=True)
     product_name = models.CharField(max_length=255, null=False)
@@ -278,7 +278,7 @@ class ProductMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# capability master
 class CapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
     capability_name = models.CharField(max_length=255, null=False)
@@ -288,7 +288,7 @@ class CapabilityMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
-
+# sub capability master
 class SubCapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
     capability = models.ForeignKey(CapabilityMaster, on_delete=models.CASCADE)
