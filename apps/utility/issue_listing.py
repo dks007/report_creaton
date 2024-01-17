@@ -154,6 +154,7 @@ def issue_list_data():
 
     # check if the request response was successful
     if response.status_code == 200:
+
         issues_data = json.loads(response.text)
         # Insert data into Django model
         for issue in issues_data['issues']:
@@ -235,27 +236,27 @@ def issue_list_data():
                 "menu_description": menu_description,
                 "activity_short_name": activity_short_name,
                 "partner": partner,
-                # "activit_project_id": activit_project_id,
+                "activit_project_id": activit_project_id,
                 "project_id": project_id,
                 "project_key": project_key,
                 "customer_id": customer_id,
                 "project_name": project_name,
-                # "customer_email": customer_email,
+                "customer_email": customer_email,
                 "customer_contact_no": customer_contact_no,
                 "customer_contact": customer_contact,
                 "customer_location": customer_location,
-                # "snow_request_no": snow_request_no,
-                # "issue_id": issue_id,
+                "snow_request_no": snow_request_no,
+                "issue_id": issue_id,
                 "created": created,
                 "changelog_assignee_created": changelog_assignee_created if changelog_assignee_created else None,
-                # "creator_email": creator_email,
-                # "parent_id": parent_id,
-                # "parent_key": parent_key,
+                "creator_email": creator_email,
+                "parent_id": parent_id,
+                "parent_key": parent_key,
                 "parent_summary": parent_summary,
                 "subtask": subtask,
-                # "assignee_email": assignee_email,
+                "assignee_email": assignee_email,
                 "assignee_name": assignee_name,
-                # "assignee_id": assignee_id,
+                "assignee_id": assignee_id,
                 "issue_status": issue_status
             }
 
@@ -267,6 +268,7 @@ def issue_list_data():
         # Print or save the JSON data as needed
         # print(json_data)
         print("Data has been fetched successfully!")
+
         return json_data
 
 

@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth  # Use the appropriate authentication method
 from django.conf import settings
 
+
 def create_folder_and_upload_to_sharepoint(success_report):
     base_url = settings.SHAREPOINT_BASE_URL
     site_url = settings.SHAREPOINT_SITE_URL
@@ -24,14 +25,14 @@ def create_folder_and_upload_to_sharepoint(success_report):
         "Accept": "application/json;odata=verbose",
         "Content-Type": "application/json;odata=verbose",
     }
-    
+
     folder_response = requests.post(
         folder_endpoint,
         json=folder_payload,
         headers=folder_headers,
         auth=HTTPBasicAuth(username, password),
     )
-    
+
     if folder_response.status_code != 201:
         raise Exception(f"Failed to create folder. Response: {folder_response.text}")
 

@@ -1,25 +1,33 @@
-# success_tool/celery.py
+"""
+Celery Basic configuration
+"""
+
+# python imports
 import os
+
+# third party imports
 from celery import Celery
-from celery.schedules import crontab
+from django.conf import settings
+from dotenv import load_dotenv
 
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'success_tool.settings')
+# OR, the same with increased verbosity:
+load_dotenv(verbose=True)
 
-# create a Celery instance and configure it with the Django settings.
-app = Celery('success_tool')
+env_path = os.path.join(os.path.abspath(os.path.join('.env', os.pardir)), '.env')
 
-# Using a string here means the worker doesn't have to serialize
-# the configuration object to child processes.
-app.config_from_object('django.conf:settings', namespace='CELERY')
+load_dotenv(dotenv_path=env_path)
 
-# Load task modules from all registered Django app configs.
-app.autodiscover_tasks()
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', os.getenv('SETTINGS'))
 
-# Celery Beat schedule
-app.conf.beat_schedule = {
-    'fetch-and-save-jira-data': {
-        'task': 'success_tool.tasks.fetch_and_save_jira_data',
-        'schedule': crontab(minute=0, hour=0),  # Adjust the schedule as needed
-    },
-}
+app = Celery()
+
+app.config_from_object('django.conf:settings')
+
+# Load task modules from all registered Django apps.
+app.autodiscover_tasks(settings.INSTALLED_APPS)
+
+
+@app.task(bind=True)
+def debug_task(self):
+    """ celery debug task """
+    print(f'Request: {self.request!r}')

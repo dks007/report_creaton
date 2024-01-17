@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 import mysql.connector
 import os
@@ -20,8 +22,8 @@ mysql_config = {
 
 # Excel file path and sheet name
 excel_file_path = '/home/rafique/Desktop/reporting/apps/utility/data_mapping_1.xlsx'
-sheet_name = 'customer_project'
-table_name = 'dashboard_projectmaster'
+sheet_name = 'menu_sdo'
+table_name = 'dashboard_sdomaster'
 
 # Connect to MySQL
 conn = mysql.connector.connect(**mysql_config)
@@ -35,7 +37,16 @@ for index, row in df.iterrows():
     # print(index, " >>>> ", row[0])
     # success_service_name = row[5]  # row index need to insert
     # customer_id = row[3] #if len(row) > 2 and row[2] is not None else 'NA'
-    project_name = row[3]
+    # customer_id = row[2]
+    sdo_name = row[1]
+    sdo_email = 'NA'
+    # template_file_name = row[2]
+    # if isinstance(success_service_name, float) and math.isnan(success_service_name):
+    #     success_service_name = 'NA'
+    # elif success_service_name == 'nan':
+    #     success_service_name = 'NA'
+
+    # print(csm_name)
     # menu_description = row[1]
     # template_file_name = row[2]
     # template_file_path = 'file_path'
@@ -44,15 +55,15 @@ for index, row in df.iterrows():
 
     # print(industry_type_name, '>>>>>>>>>', industry_description)
 
-    if project_name is None or project_name == '':
-        continue
+    # if csm_name is None or csm_name == '':
+    #     continue
 
 
     # Assuming your table has columns named col1, col2, col3
-    sql = f"INSERT INTO {table_name} (project_name, created_by, created_date, updated_by, updated_date, status) VALUES (%s, 1, CURDATE(), 1, CURDATE(), 1)"
+    sql = f"INSERT INTO {table_name} (sdo_name, sdo_email, created_date, updated_date, status) VALUES (%s, %s, CURDATE(), CURDATE(), 1)"
 
     try:
-        cursor.execute(sql, (project_name,))
+        cursor.execute(sql, (sdo_name, sdo_email))
         conn.commit()
         print("Record inserted successfully")
     except mysql.connector.Error as err:
