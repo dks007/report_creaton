@@ -26,7 +26,7 @@ class CustomerMapping(models.Model):
     status = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return f"CustomerMapping {self.id} - {self.customer_id.customer_name} - {self.project_id.project_name}"
+        return f"CustomerMapping {self.id} - {self.customer.customer_name} - {self.project.project_name}"
 
 
 # csm master
@@ -40,6 +40,9 @@ class CSMMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.csm_name}"
+
 
 # sdm master
 class SDMMaster(models.Model):
@@ -51,6 +54,9 @@ class SDMMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.sdm_name}"
 
 
 # psm master
@@ -64,6 +70,9 @@ class PSMMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.psm_name}"
+
 
 # industry master
 class IndustryMaster(models.Model):
@@ -76,6 +85,9 @@ class IndustryMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.industry_type_name}"
+
 
 # Region master
 class RegionMaster(models.Model):
@@ -86,6 +98,9 @@ class RegionMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.region_name}"
 
 
 # customer master
@@ -99,6 +114,9 @@ class CustomerMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.customer_name}"
+
 
 # success element master
 class SuccessElementsMaster(models.Model):
@@ -109,6 +127,9 @@ class SuccessElementsMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.success_element_name}"
 
 
 # success service master
@@ -121,6 +142,9 @@ class SuccessServiceMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.success_service_name}"
+
 
 # project master
 class ProjectMaster(models.Model):
@@ -132,6 +156,9 @@ class ProjectMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.project_name}"
 
 
 # menu card master
@@ -270,6 +297,9 @@ class ProductMaster(models.Model):
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
 
+    def __str__(self):
+        return f"{self.id} - {self.product_name}"
+
 
 # capability master
 class CapabilityMaster(models.Model):
@@ -280,6 +310,9 @@ class CapabilityMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.capability_name}"
 
 
 # sub capability master
@@ -292,3 +325,6 @@ class SubCapabilityMaster(models.Model):
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
     status = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.id} - {self.sub_capability_name}"

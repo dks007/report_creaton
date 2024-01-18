@@ -12,11 +12,12 @@ from apps.dashboard.models.masters import (SdoMaster, MenuCardMaster, MenuSdoMap
 
 def insert_data():
     menu_card_data = MenuCardMaster.objects.all()
+    # print(menu_card_data,'>>>>>>>>>>')
 
     for mn in menu_card_data:
 
-        if mn.menu_card.startswith("EMA") or mn.menu_card.startswith("TAA"):
-            sdo = SdoMaster.objects.get(id=3)
+        if mn.menu_card.startswith("SAA"):
+            sdo = SdoMaster.objects.get(id=1)
             MenuSdoMapping.objects.create(
                 menu_card_id=mn,
                 sdo_id=sdo,
@@ -24,7 +25,8 @@ def insert_data():
             )
     return True
 
-# insert_data()
+# a=insert_data()
+# print(a)
 
 
 def insert_details():
@@ -40,15 +42,15 @@ def insert_details():
 
     for cus, reg, pr, suc, cs, ps, sd, ind, succ in zip(customer,region, project, success, csm, psm, sdm, inds,succE):
         CustomerMapping.objects.create(
-            customer_id=cus,
-            region_id=reg,
-            project_id=pr,
-            success_service_id=suc,
-            csm_id=cs,
-            psm_id=ps,
-            sdm_id=sd,
-            industry_id=ind,
-            success_elements_id=succ,
+            customer=cus,
+            region=reg,
+            project=pr,
+            success_service=suc,
+            csm=cs,
+            psm=ps,
+            sdm=sd,
+            industry=ind,
+            success_elements=succ,
             description='description',
             created_date=datetime.date.today(),
             updated_date=datetime.date.today(),
@@ -61,6 +63,3 @@ def insert_details():
 
 # test = insert_details()
 # print(test)
-def abc():
-    print(os.getenv('JIRA_URL'))
-abc()

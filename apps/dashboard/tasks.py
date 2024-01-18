@@ -1,4 +1,6 @@
 # success_tool/tasks.py
+import os
+
 from celery import shared_task
 from datetime import datetime
 from requests.auth import HTTPBasicAuth
@@ -11,9 +13,8 @@ from apps.dashboard.models import Issue
 
 @shared_task
 def fetch_and_save_jira_data():
-    url = "https://ifsdev.atlassian.net/rest/api/3/search"
-    auth = HTTPBasicAuth("dilip.kumar.shrivastwa@ifs.com",
-                         "ATATT3xFfGF0p-FG8-lj6HsWs80g3AtzRePPZ4WDbZEq_ZlDJoEVV3zcusdMdiyGxn1do8ldFe4Tgy4OcC2gOc9yArvRSzZ24z13JqWPxKsJvvinVybUIwYdlnla8QErcuYl0XnMBvLc_Fn_sk2TntBf1Rj4DZ-hkL5FOr4xu5kDo9M2rna2vEQ=B3F4BE74")
+    url = os.getenv('JIRA_URL')
+    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
 
     max_duration_seconds = 60
     start_time = time.time()

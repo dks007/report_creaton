@@ -94,8 +94,8 @@ def issue_list_data():
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    url = "https://ifsdev.atlassian.net/rest/api/3/search"
-    auth = HTTPBasicAuth('username', 'password')
+    url = os.getenv('JIRA_URL')
+    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
     # cutome fields names
     # customfield_16032 => customer contact
     # customfield_16015 => start date
