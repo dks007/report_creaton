@@ -23,7 +23,7 @@ class CustomerMapping(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by_user', null=True,
                                    blank=True)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.CharField(max_length=255, null=True)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"CustomerMapping {self.id} - {self.customer.customer_name} - {self.project.project_name}"
@@ -38,7 +38,7 @@ class CSMMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.csm_name}"
@@ -53,7 +53,7 @@ class SDMMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.sdm_name}"
@@ -68,7 +68,7 @@ class PSMMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.psm_name}"
@@ -83,7 +83,7 @@ class IndustryMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.industry_type_name}"
@@ -97,7 +97,7 @@ class RegionMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.region_name}"
@@ -112,7 +112,7 @@ class CustomerMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.customer_name}"
@@ -126,7 +126,7 @@ class SuccessElementsMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.success_element_name}"
@@ -140,7 +140,7 @@ class SuccessServiceMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.success_service_name}"
@@ -155,7 +155,7 @@ class ProjectMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.project_name}"
@@ -176,7 +176,7 @@ class MenuCardMaster(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='menu_card_updated_by', null=True,
                                    blank=True)
     updated_date = models.DateTimeField(auto_now_add=True, null=False, blank=True)
-    status = models.CharField(max_length=255, null=True, blank=True)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"MenuCardMaster {self.id} - {self.menu_card}"
@@ -191,7 +191,7 @@ class SdoMaster(models.Model):
     created_date = models.DateTimeField(default=datetime.date.today(), null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdo_updated_by', null=True, blank=True)
     updated_date = models.DateTimeField(default=datetime.date.today(), null=False)
-    status = models.CharField(max_length=255, null=True, blank=True)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"SdoMaster - {self.sdo_name}"
@@ -206,7 +206,7 @@ class MenuSdoMapping(models.Model):
     created_date = models.DateTimeField(default=datetime.date.today(), null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdo_updated_by', null=True, blank=True)
     updated_date = models.DateTimeField(default=datetime.date.today(), null=False)
-    status = models.CharField(max_length=255, null=True, blank=True)
+    status = models.IntegerField(null=True, blank=True)
 
 
     def __str__(self):
@@ -223,7 +223,7 @@ class ExpertMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
@@ -239,7 +239,7 @@ class CreatorMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
@@ -257,7 +257,7 @@ class LogoMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"
@@ -286,6 +286,7 @@ class ReportStatusMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"ReportStatusMaster {self.id} - {self.report_status_name}"
@@ -295,11 +296,12 @@ class ReportStatusMaster(models.Model):
 class ProductMaster(models.Model):
     id = models.AutoField(primary_key=True)
     product_name = models.CharField(max_length=255, null=False)
+    product_description = models.TextField(null=False)
     created_by = models.CharField(max_length=255, null=False)
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.product_name}"
@@ -309,11 +311,12 @@ class ProductMaster(models.Model):
 class CapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
     capability_name = models.CharField(max_length=255, null=False)
+    capability_description = models.TextField(null=False)
     created_by = models.CharField(max_length=255, null=False)
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.capability_name}"
@@ -324,11 +327,12 @@ class SubCapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
     capability = models.ForeignKey(CapabilityMaster, on_delete=models.CASCADE)
     sub_capability_name = models.CharField(max_length=255, null=False)
+    sub_capability_description = models.TextField(null=False)
     created_by = models.CharField(max_length=255, null=False)
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.CharField(max_length=255, null=False)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.CharField(max_length=255, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.sub_capability_name}"

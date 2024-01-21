@@ -27,7 +27,11 @@ class CustomerProject(models.Model):
     success_elements = models.CharField(max_length=255, help_text="Success elements of the project",   null=True, blank=True)
     description = models.TextField(help_text="Description of the project",   null=True, blank=True)
     date_created = models.DateField(default=timezone.now, help_text="Date when the project was created",   null=True, blank=True)
-
+    created_by = models.CharField(max_length=255, null=False)
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
+    updated_by = models.CharField(max_length=255, null=False)
+    updated_date = models.DateTimeField(auto_now=True, null=False)
+    status =models.IntegerField(null=True, blank=True)
     def __str__(self):
         return f"{self.customer_name} - {self.project_id}"
 
@@ -39,6 +43,11 @@ class MenuSdo(models.Model):
     menu_card = models.CharField(max_length=255, help_text="Name of the menu card")
     sdo = models.CharField(max_length=255, help_text="SDO associated with the menu card")
     email = models.EmailField(help_text="Email associated with the menu card")
+    created_by = models.CharField(max_length=255, null=False)
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
+    updated_by = models.CharField(max_length=255, null=False)
+    updated_date = models.DateTimeField(auto_now=True, null=False)
+    status =models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.menu_card} - {self.sdo}"
