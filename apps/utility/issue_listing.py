@@ -152,6 +152,14 @@ def issue_list_data():
         verify=False
     )
 
+    json_file_path = "apps/dashboard/findproductcap.json"
+    response.status_code =200
+    # Open the file in read mode
+    with open(json_file_path, "r") as json_file:
+        # Load the JSON data from the file
+        data = json.load(json_file)
+    response.text = data
+    
     # check if the request response was successful
     if response.status_code == 200:
 
