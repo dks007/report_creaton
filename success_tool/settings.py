@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-import saml2
+#import saml2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'apps.accounts',
     'apps.dashboard',
-    'djangosaml2',
+    #'djangosaml2',
 
 ]
 
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'djangosaml2.middleware.SamlSessionMiddleware',
+    #'djangosaml2.middleware.SamlSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'success_tool.urls'
@@ -225,28 +225,28 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_ENABLE_UTC = True
 
 
-SAML_CONFIG = {
-    'metadata': {
-        'remote': [
-            {
-                'url': 'https://login.microsoftonline.com/2fc44a20-542d-4574-a028-c27cc470695a/federationmetadata/2007-06/federationmetadata.xml',
-            },
-        ],
-    },
-    'entityid': 'your-django-app-entity-id',
-    'service': {
-        'sp': {
-            'name': 'Your Django App',
-            'endpoints': {
-                'assertion_consumer_service': [
-                    ('http://127.0.0.1:8000/api/data/', saml2.BINDING_HTTP_POST),
-                ],
-            },
-            'required_attributes': ['email'],
-            'optional_attributes': [],
-        },
-    },
-}
+# SAML_CONFIG = {
+#     'metadata': {
+#         'remote': [
+#             {
+#                 'url': 'https://login.microsoftonline.com/2fc44a20-542d-4574-a028-c27cc470695a/federationmetadata/2007-06/federationmetadata.xml',
+#             },
+#         ],
+#     },
+#     'entityid': 'your-django-app-entity-id',
+#     'service': {
+#         'sp': {
+#             'name': 'Your Django App',
+#             'endpoints': {
+#                 'assertion_consumer_service': [
+#                     ('http://127.0.0.1:8000/api/data/', saml2.BINDING_HTTP_POST),
+#                 ],
+#             },
+#             'required_attributes': ['email'],
+#             'optional_attributes': [],
+#         },
+#     },
+# }
 
 
 
