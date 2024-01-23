@@ -2,7 +2,7 @@
 import datetime
 from django.contrib.auth.models import User
 from django.db import models
-
+from django.utils import timezone
 
 class StatusMaster(models.Model):
     id = models.AutoField(primary_key=True)
@@ -197,13 +197,12 @@ class MenuCardMaster(models.Model):
 
 # sdo master
 class SdoMaster(models.Model):
-    # id = models.AutoField(primary_key=True)
     sdo_name = models.CharField(max_length=255, null=False)
     sdo_email = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdo_created_by')
-    created_date = models.DateTimeField(default=datetime.date.today(), null=False)
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='sdo_updated_by')
-    updated_date = models.DateTimeField(default=datetime.date.today(), null=False)
+    updated_date = models.DateTimeField(auto_now_add=True, null=False)
     status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='sdo_status')
 
     def __str__(self):
@@ -217,9 +216,9 @@ class MenuSdoMapping(models.Model):
     menu_card = models.ForeignKey(MenuCardMaster, on_delete=models.CASCADE)
     sdo = models.ForeignKey(SdoMaster, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='menusdo_created_by')
-    created_date = models.DateTimeField(default=datetime.date.today(), null=False)
+    created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='menusdo_updated_by')
-    updated_date = models.DateTimeField(default=datetime.date.today(), null=False)
+    updated_date = models.DateTimeField(auto_now_add=True, null=False)
     status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='menusdo_status')
 
     def __str__(self):
