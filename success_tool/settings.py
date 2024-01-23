@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-#import saml2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,8 +40,6 @@ INSTALLED_APPS = [
     'drf_yasg',
     'apps.accounts',
     'apps.dashboard',
-    #'djangosaml2',
-
 ]
 
 MIDDLEWARE = [
@@ -53,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'djangosaml2.middleware.SamlSessionMiddleware',
 ]
 
 ROOT_URLCONF = 'success_tool.urls'
@@ -88,10 +84,6 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST'),  # Replace with your MySQL server host if it's not local
         'PORT': os.getenv('DB_PORT'),  # Replace with your MySQL server port if it's not the default
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
 }
 
 # Password validation
@@ -123,13 +115,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -140,8 +128,6 @@ MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 # Configure Django Rest Framework settings for authentication
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'account.backends.AzureADAuthentication',
-        # 'djangosaml2.backends.Saml2Backend',
         'rest_framework.authentication.SessionAuthentication',
     ],
 
@@ -223,30 +209,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_RESULT_EXPIRES = 60 * 60 * 24  # 1 day
 CELERY_TIMEZONE = 'UTC'
 CELERY_ENABLE_UTC = True
-
-
-# SAML_CONFIG = {
-#     'metadata': {
-#         'remote': [
-#             {
-#                 'url': 'https://login.microsoftonline.com/2fc44a20-542d-4574-a028-c27cc470695a/federationmetadata/2007-06/federationmetadata.xml',
-#             },
-#         ],
-#     },
-#     'entityid': 'your-django-app-entity-id',
-#     'service': {
-#         'sp': {
-#             'name': 'Your Django App',
-#             'endpoints': {
-#                 'assertion_consumer_service': [
-#                     ('http://127.0.0.1:8000/api/data/', saml2.BINDING_HTTP_POST),
-#                 ],
-#             },
-#             'required_attributes': ['email'],
-#             'optional_attributes': [],
-#         },
-#     },
-# }
 
 
 

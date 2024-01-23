@@ -1,6 +1,5 @@
 import os
 from urllib import response
-import environ
 from office365.sharepoint.client_context import ClientContext
 from office365.runtime.auth.user_credential import UserCredential
 from office365.sharepoint.files.file import File

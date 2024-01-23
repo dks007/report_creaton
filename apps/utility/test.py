@@ -21,9 +21,9 @@ mysql_config = {
 }
 
 # Excel file path and sheet name
-excel_file_path = '/home/rafique/Desktop/reporting/apps/utility/data_mapping_1.xlsx'
-sheet_name = 'customer_project'
-table_name = 'dashboard_projectmaster'
+excel_file_path = '/home/rafique/Desktop/reporting/apps/utility/data_mapping_1 (1).xlsx'
+sheet_name = 'product_capability'
+table_name = 'dashboard_capabilitymaster'
 
 # Connect to MySQL
 conn = mysql.connector.connect(**mysql_config)
@@ -38,7 +38,10 @@ for index, row in df.iterrows():
     # success_service_name = row[5]  # row index need to insert
     # customer_id = row[3] #if len(row) > 2 and row[2] is not None else 'NA'
     # customer_id = row[2]
-    project_name = row[1]
+    capability_name = row[0]
+    capability_description = 'NA'
+    if capability_name == 'Capability':
+        continue
     # project_logo_id = row[3]
     # template_file_name = row[2]
     # if isinstance(success_service_name, float) and math.isnan(success_service_name):
@@ -60,10 +63,10 @@ for index, row in df.iterrows():
 
 
     # Assuming your table has columns named col1, col2, col3
-    sql = f"INSERT INTO {table_name} (project_name, created_by, created_date, updated_by, updated_date, status) VALUES (%s, 1, CURDATE(), 1, CURDATE(), 1)"
+    sql = f"INSERT INTO {table_name} (capability_name, capability_description, created_by, created_date, updated_by, updated_date, status) VALUES (%s, %s, 1, CURDATE(), 1, CURDATE(), 1)"
 
     try:
-        cursor.execute(sql, (project_name,))
+        cursor.execute(sql, (capability_name, capability_description))
         conn.commit()
         print("Record inserted successfully")
     except mysql.connector.Error as err:
