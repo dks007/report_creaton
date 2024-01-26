@@ -21,8 +21,10 @@ class StatusMaster(models.Model):
 class CustomerMapping(models.Model):
     id = models.BigAutoField(primary_key=True)
     customer = models.ForeignKey('CustomerMaster', on_delete=models.CASCADE)
-    region = models.ForeignKey('RegionMaster', on_delete=models.CASCADE)
-    project = models.ForeignKey('ProjectMaster', on_delete=models.CASCADE)
+    region = models.ForeignKey('RegionMaster', on_delete=models.CASCADE,null=True,
+                                   blank=True)
+    project = models.ForeignKey('ProjectMaster', on_delete=models.CASCADE,null=True,
+                                   blank=True)
     opp_no = models.CharField(max_length=100, null=True)
     success_service = models.ForeignKey('SuccessServiceMaster', on_delete=models.SET_NULL, null=True)
     csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True)
