@@ -41,7 +41,7 @@ class CustomerMapping(models.Model):
     status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"CustomerMapping {self.id} - {self.customer.customer_name} - {self.project.project_name}"
+        return f"CustomerMapping {self.id} - {self.customer.customer_name} "
 
 
 # csm master
