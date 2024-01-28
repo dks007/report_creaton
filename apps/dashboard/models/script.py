@@ -31,6 +31,8 @@ def insert_from_excel(filename):
             'CSM': (CSMMaster, 'csm_name'),
             'PSM': (PSMMaster, 'psm_name'),
             'SDM': (SDMMaster, 'sdm_name'),
+            'Industry': (IndustryMaster, 'industry_type_name'),
+            'Success Elements': (SuccessElementsMaster, 'success_element_name'),
         }
 
         for row in ws.iter_rows(min_row=2, values_only=True):
@@ -61,6 +63,8 @@ def insert_from_excel(filename):
                     csm=master_objects.get('CSM'),
                     psm=master_objects.get('PSM'),
                     sdm=master_objects.get('SDM'),
+                    industry=master_objects.get('Industry'),
+                    success_elements=master_objects.get('Success Elements'),
                     opp_no=row[4],
                     description=row[10],  # Assuming description is in the 11th column
                     created_by=User.objects.first(),  # Replace with appropriate user
