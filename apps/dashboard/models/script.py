@@ -66,7 +66,7 @@ def insert_from_excel(filename):
                     industry=master_objects.get('Industry'),
                     success_elements=master_objects.get('Success Elements'),
                     opp_no=row[4],
-                    description=row[10],  # Assuming description is in the 11th column
+                    description=row[11],  # Assuming description is in the 11th column
                     created_by=User.objects.first(),  # Replace with appropriate user
                     created_date=datetime.datetime.now(),
                     updated_by=User.objects.first(),  # Replace with appropriate user
