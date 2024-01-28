@@ -7,6 +7,9 @@ import time
 from datetime import datetime
 import os
 
+from apps.dashboard.models import SuccessReport
+from apps.dashboard.models.masters import CustomerMapping
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 
 import django
@@ -94,8 +97,8 @@ def issue_list_data():
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    url = os.getenv('JIRA_URL')
-    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
+    # url = os.getenv('JIRA_URL')
+    # auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
     # cutome fields names
     # customfield_16032 => customer contact
     # customfield_16015 => start date
@@ -153,16 +156,15 @@ def issue_list_data():
     )
 
     json_file_path = "apps/dashboard/findproductcap.json"
-    response.status_code =200
+    response.status_code = 200
     # Open the file in read mode
     with open(json_file_path, "r") as json_file:
         # Load the JSON data from the file
         data = json.load(json_file)
     response.text = data
-    
+
     # check if the request response was successful
     if response.status_code == 200:
-
         issues_data = json.loads(response.text)
         # Insert data into Django model
         for issue in issues_data['issues']:
@@ -273,11 +275,26 @@ def issue_list_data():
 
         # Convert the list of dictionaries to a JSON string
         json_data = json.dumps(data_list, indent=2)
+        response = json.loads(json_data)
+        for dt in response:
+            desc = MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
+            report_status = SuccessReport.objects.filter(jira_key=dt.get('issue_key')).first()
+            customer_map = CustomerMapping.objects.filter(customer__customer_id=dt.get('customer_id')).first()
+            if report_status:
+                dt['status'] = report_status.report_status.report_status_name
+            else:
+                dt['status'] = 'Not Created'
+            if desc is not None:
+                dt['menu_description'] = desc.menu_description
+            if customer_map:
+                dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else 'NA'
+                dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else 'NA'
+                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else 'NA'
         # Print or save the JSON data as needed
         # print(json_data)
         print("Data has been fetched successfully!")
 
-        return json_data
+        return response
 
 
 

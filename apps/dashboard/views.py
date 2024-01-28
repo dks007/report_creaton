@@ -24,17 +24,6 @@ def get_issue_list(request):
     """
     if request.method == 'GET':
         response = issue_list_data()
-        response = json.loads(response)
-
-        for dt in response:
-            desc = MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
-            report_status = SuccessReport.objects.filter(jira_key=dt.get('issue_key')).first()
-            if report_status:
-                dt['status'] = report_status.report_status.report_status_name
-            else:
-                dt['status'] = 'Not Created'
-            if desc is not None:
-                dt['menu_description'] = desc.menu_description
         return JsonResponse({'data': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
