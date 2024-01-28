@@ -1,0 +1,55 @@
+
+git --version
+
+#output : git version 2.27.0.windows.1
+
+front end Git Url : https://github.com/dks007/report_creaton_frontend.git
+
+front end : git clone https://github.com/dks007/report_creaton_frontend.git
+
+git branch --all
+
+git clone from dev branch
+
+Clone the repository and fetch only a single branch.
+
+git clone --branch <branchname> <remote-repo-url>
+or
+git clone -b <branchname> <remote-repo-url>
+
+git clone --branch dev https://github.com/dks007/report_creaton_frontend.git
+
+// list all branch
+
+git branch -a 
+
+git checkout dev
+---------------------------------------------------------------
+Remote is the URL that points you to the repository on the internet while Origin is an alias for this remote URL.
+
+git remote show origin
+
+
+======================git push=====================================
+
+git add .
+
+git commit -m"updates"
+
+if require :
+	git push --set-upstream origin dks_local
+	
+	
+	
+===================================================================
+
+git rm -r one-of-the-directories // This deletes from filesystem
+git commit . -m "Remove duplicated directory"
+git push origin <your-git-branch> (typically 'master', but not always)
+
+
+git rm -r --cached myFolder
+
+
+
+
