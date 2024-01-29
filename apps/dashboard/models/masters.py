@@ -6,7 +6,7 @@ from django.utils import timezone
 
 class StatusMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    status_name = models.CharField(max_length=255, null=False)
+    status_name = models.CharField(max_length=25, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='status_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='status_updated_by',  null=True, blank=True)
@@ -25,7 +25,7 @@ class CustomerMapping(models.Model):
                                    blank=True)
     project = models.ForeignKey('ProjectMaster', on_delete=models.CASCADE,null=True,
                                    blank=True)
-    opp_no = models.CharField(max_length=100, null=True)
+    opp_no = models.CharField(max_length=25, null=True)
     success_service = models.ForeignKey('SuccessServiceMaster', on_delete=models.SET_NULL, null=True)
     csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True)
     psm = models.ForeignKey('PSMMaster', on_delete=models.SET_NULL, null=True)
@@ -38,7 +38,7 @@ class CustomerMapping(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by_user', null=True,
                                    blank=True)
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"CustomerMapping {self.id} - {self.customer.customer_name} "
@@ -47,13 +47,13 @@ class CustomerMapping(models.Model):
 # csm master
 class CSMMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    csm_name = models.CharField(max_length=255, null=False)
+    csm_name = models.CharField(max_length=50, null=False, unique=True)
     csm_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='csm_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='csm_updated_by', null=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, related_name='csm_status', null=True, blank=True)
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, related_name='csm_status', null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.csm_name}"
@@ -62,13 +62,13 @@ class CSMMaster(models.Model):
 # sdm master
 class SDMMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    sdm_name = models.CharField(max_length=255, null=False)
+    sdm_name = models.CharField(max_length=50, null=False, unique=True)
     sdm_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdm_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdm_updated_by', null=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, related_name='sdm_status', null=True, blank=True)
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, related_name='sdm_status', null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.sdm_name}"
@@ -77,13 +77,13 @@ class SDMMaster(models.Model):
 # psm master
 class PSMMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    psm_name = models.CharField(max_length=255, null=False)
+    psm_name = models.CharField(max_length=50, null=False, unique=True)
     psm_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='psm_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='psm_updated_by', null=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, related_name='psm_status', null=True, blank=True)
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, related_name='psm_status', null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.psm_name}"
@@ -92,13 +92,13 @@ class PSMMaster(models.Model):
 # industry master
 class IndustryMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    industry_type_name = models.CharField(max_length=255, null=False)
+    industry_type_name = models.CharField(max_length=50, null=False, unique=True)
     industry_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='industry_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='industry_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='industry_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='industry_status')
 
     def __str__(self):
         return f"{self.id} - {self.industry_type_name}"
@@ -107,12 +107,12 @@ class IndustryMaster(models.Model):
 # Region master
 class RegionMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    region_name = models.CharField(max_length=255, null=False)
+    region_name = models.CharField(max_length=50, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='region_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='region_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='region_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='region_status')
 
     def __str__(self):
         return f"{self.id} - {self.region_name}"
@@ -121,13 +121,13 @@ class RegionMaster(models.Model):
 # customer master
 class CustomerMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    customer_id = models.CharField(max_length=255, null=False)
-    customer_name = models.CharField(max_length=255, null=False)
+    customer_id = models.CharField(max_length=50, null=False, unique=True)
+    customer_name = models.CharField(max_length=100, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='customer_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='customer_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='customer_status')
 
     def __str__(self):
         return f"{self.id} - {self.customer_name}"
@@ -136,12 +136,12 @@ class CustomerMaster(models.Model):
 # success element master
 class SuccessElementsMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    success_element_name = models.CharField(max_length=255, null=False)
+    success_element_name = models.CharField(max_length=100, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='success_element_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='success_element_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='success_element_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='success_element_status')
 
     def __str__(self):
         return f"{self.id} - {self.success_element_name}"
@@ -150,12 +150,12 @@ class SuccessElementsMaster(models.Model):
 # success service master
 class SuccessServiceMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    success_service_name = models.CharField(max_length=255, null=False)
+    success_service_name = models.CharField(max_length=50, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='success_service_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='success_service_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='success_service_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='success_service_status')
 
     def __str__(self):
         return f"{self.id} - {self.success_service_name}"
@@ -164,13 +164,13 @@ class SuccessServiceMaster(models.Model):
 # project master
 class ProjectMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    project_name = models.CharField(max_length=255, null=False)
+    project_name = models.CharField(max_length=100, null=False, unique=True)
     project_logo_id = models.IntegerField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='project_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='project_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='project_status')
 
     def __str__(self):
         return f"{self.id} - {self.project_name}"
@@ -179,7 +179,7 @@ class ProjectMaster(models.Model):
 # menu card master
 class MenuCardMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    menu_card = models.CharField(max_length=10, null=False)
+    menu_card = models.CharField(max_length=10, null=False, unique=True)
     menu_description = models.TextField()
     template_file_name = models.CharField(max_length=255, null=True)
     template_file_path = models.TextField(null=True)
@@ -191,7 +191,7 @@ class MenuCardMaster(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='menu_card_updated_by', null=True,
                                    blank=True)
     updated_date = models.DateTimeField(auto_now_add=True, null=False, blank=True)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='menu_card_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='menu_card_status')
 
     def __str__(self):
         return f"MenuCardMaster {self.id} - {self.menu_card}"
@@ -199,13 +199,13 @@ class MenuCardMaster(models.Model):
 
 # sdo master
 class SdoMaster(models.Model):
-    sdo_name = models.CharField(max_length=255, null=False)
+    sdo_name = models.CharField(max_length=50, null=False, unique=True)
     sdo_email = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdo_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='sdo_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='sdo_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='sdo_status')
 
     def __str__(self):
         return f"SdoMaster - {self.sdo_name}"
@@ -215,13 +215,13 @@ class SdoMaster(models.Model):
 class MenuSdoMapping(models.Model):
     id = models.AutoField(primary_key=True)
 
-    menu_card = models.ForeignKey(MenuCardMaster, on_delete=models.CASCADE)
+    menu_card = models.ForeignKey(MenuCardMaster, on_delete=models.PROTECT)
     sdo = models.ForeignKey(SdoMaster, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='menusdo_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='menusdo_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='menusdo_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='menusdo_status')
 
     def __str__(self):
         return f"MenuSdoMapping {self.id} - MenuCard: {self.menu_card.menu_card}, Sdo: {self.sdo.sdo_name}"
@@ -230,14 +230,14 @@ class MenuSdoMapping(models.Model):
 # expert master
 class ExpertMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    expert_account_id = models.CharField(max_length=255, null=False)
-    expert_name = models.CharField(max_length=255, null=False)
+    expert_account_id = models.CharField(max_length=80, null=False)
+    expert_name = models.CharField(max_length=100, null=False, unique=True)
     expert_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expert_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='expert_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='expert_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='expert_status')
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
@@ -246,14 +246,14 @@ class ExpertMaster(models.Model):
 # creator master
 class CreatorMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    creator_account_id = models.CharField(max_length=255, null=False)
-    creator_name = models.CharField(max_length=255, null=False)
+    creator_account_id = models.CharField(max_length=80, null=False)
+    creator_name = models.CharField(max_length=100, null=False, unique=True)
     creator_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='creator_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='creator_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='creator_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='creator_status')
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
@@ -262,7 +262,7 @@ class CreatorMaster(models.Model):
 # Logo master
 class LogoMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    logo_file_name = models.CharField(max_length=8, null=False)
+    logo_file_name = models.CharField(max_length=50, null=False, unique=True)
     logo_file_type = models.CharField(max_length=10, null=True)
     logo_file_size = models.IntegerField(null=False)
     logo_url = models.CharField(max_length=255, null=False)
@@ -271,7 +271,7 @@ class LogoMaster(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, null=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='logo_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='logo_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='logo_status')
 
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"
@@ -280,13 +280,13 @@ class LogoMaster(models.Model):
 # Report status master
 class ReportStatusMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    report_status_name = models.CharField(max_length=255, null=False)
+    report_status_name = models.CharField(max_length=25, null=False, unique=True)
     status_description = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='report_status_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='report_status_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='report_status_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='report_status_status')
 
     def __str__(self):
         return f"ReportStatusMaster {self.id} - {self.report_status_name}"
@@ -295,13 +295,13 @@ class ReportStatusMaster(models.Model):
 # Product master
 class ProductMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    product_name = models.CharField(max_length=255, null=False)
+    product_name = models.CharField(max_length=50, null=False, unique=True)
     product_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='product_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='product_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='product_status')
 
     def __str__(self):
         return f"{self.id} - {self.product_name}"
@@ -310,13 +310,13 @@ class ProductMaster(models.Model):
 # capability master
 class CapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    capability_name = models.CharField(max_length=255, null=False)
+    capability_name = models.CharField(max_length=100, null=False, unique=True)
     capability_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='capability_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='capability_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='capabilty_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='capabilty_status')
 
     def __str__(self):
         return f"{self.id} - {self.capability_name}"
@@ -326,13 +326,13 @@ class CapabilityMaster(models.Model):
 class SubCapabilityMaster(models.Model):
     id = models.AutoField(primary_key=True)
     capability = models.ForeignKey(CapabilityMaster, on_delete=models.CASCADE)
-    sub_capability_name = models.CharField(max_length=255, null=False)
+    sub_capability_name = models.CharField(max_length=100, null=False, unique=True)
     sub_capability_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sub_capability_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True,related_name='sub_capability_updated_by')
     updated_date = models.DateTimeField(auto_now=True, null=False)
-    status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, null=True, blank=True, related_name='sub_capability_status')
+    status = models.ForeignKey(StatusMaster, on_delete=models.PROTECT, null=True, blank=True, related_name='sub_capability_status')
 
     def __str__(self):
         return f"{self.id} - {self.sub_capability_name}"

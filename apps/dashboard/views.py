@@ -23,7 +23,7 @@ def get_issue_list(request):
     used to fetch all issues
     """
     if request.method == 'GET':
-        response = issue_list_data()
+        response = issue_list_data(request)
         return JsonResponse({'data': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
