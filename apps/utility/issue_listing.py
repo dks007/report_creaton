@@ -90,15 +90,13 @@ def find_menuid_in_string(match_str):
     return None, False
 
 
-def issue_list_data():
-    MAX_DURATION_SECONDS = 60
-    start_time = time.time()
+def issue_list_data(request):
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    # url = os.getenv('JIRA_URL')
-    # auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
+    url = os.getenv('JIRA_URL')
+    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
     # cutome fields names
     # customfield_16032 => customer contact
     # customfield_16015 => start date
@@ -146,6 +144,7 @@ def issue_list_data():
     payload['maxResults'] = 25
 
     payload['startAt'] = start_at
+    
     response = requests.request(
         "POST",
         url,
@@ -158,14 +157,16 @@ def issue_list_data():
     json_file_path = "apps/dashboard/findproductcap.json"
     response.status_code = 200
     # Open the file in read mode
-    with open(json_file_path, "r") as json_file:
+    with open(json_file_path, "r", encoding='utf-8') as json_file:
         # Load the JSON data from the file
         data = json.load(json_file)
-    response.text = data
-
+    #response.text = data
+    #modified_content = data
     # check if the request response was successful
-    if response.status_code == 200:
-        issues_data = json.loads(response.text)
+    #if response.status_code == 200:
+    if True:
+        #issues_data = json.loads(data)
+        issues_data = data
         # Insert data into Django model
         for issue in issues_data['issues']:
             menu_card = ''
