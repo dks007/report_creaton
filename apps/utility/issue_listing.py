@@ -90,7 +90,7 @@ def find_menuid_in_string(match_str):
     return None, False
 
 
-def issue_list_data(request):
+def issue_list_data(startAt=0, maxResults=10):
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
@@ -107,8 +107,8 @@ def issue_list_data(request):
     # customfield_16265 => SNow Request Item No
     # set the initial parameters
     # Specify the start and end parameters
-    startAt = 0
-    maxResults = 10  # Fetching 25 records (0-based index)
+    # startAt = 0
+    # maxResults = 10  # Fetching 25 records (0-based index)
 
     payload = {
         "expand": [
@@ -150,7 +150,7 @@ def issue_list_data(request):
         verify=False
     )
 
-    json_file_path = "apps/dashboard/findproductcap.json"
+    json_file_path = "/home/rafique/Desktop/reporting/apps/utility/findproductcap.json"
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file)
@@ -159,7 +159,7 @@ def issue_list_data(request):
     if True:
         #issues_data = json.loads(response.text)
         issues_data = data
-        #total_records = issues_data['total']
+        total_records = issues_data['total']
 
         # Insert data into Django model
         for issue in issues_data['issues']:
@@ -289,7 +289,7 @@ def issue_list_data(request):
         # print(json_data)
         print("Data has been fetched successfully!")
 
-        return response
+        return response, total_records
 
 
 
