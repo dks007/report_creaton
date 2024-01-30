@@ -47,7 +47,7 @@ class CustomerMapping(models.Model):
 # csm master
 class CSMMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    csm_name = models.CharField(max_length=50, null=False, unique=True)
+    csm_name = models.CharField(max_length=100, null=False, unique=True)
     csm_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='csm_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -62,7 +62,7 @@ class CSMMaster(models.Model):
 # sdm master
 class SDMMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    sdm_name = models.CharField(max_length=50, null=False, unique=True)
+    sdm_name = models.CharField(max_length=100, null=False, unique=True)
     sdm_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdm_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -92,7 +92,7 @@ class PSMMaster(models.Model):
 # industry master
 class IndustryMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    industry_type_name = models.CharField(max_length=50, null=False, unique=True)
+    industry_type_name = models.CharField(max_length=100, null=False, unique=True)
     industry_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='industry_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -121,7 +121,7 @@ class RegionMaster(models.Model):
 # customer master
 class CustomerMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    customer_id = models.CharField(max_length=50, null=False, unique=True)
+    customer_id = models.CharField(max_length=100, null=False, unique=True)
     customer_name = models.CharField(max_length=100, null=False, unique=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -165,6 +165,7 @@ class SuccessServiceMaster(models.Model):
 class ProjectMaster(models.Model):
     id = models.AutoField(primary_key=True)
     project_name = models.CharField(max_length=100, null=False, unique=True)
+    projectid = models.CharField(max_length=25, null=True)
     project_logo_id = models.IntegerField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='project_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -199,7 +200,7 @@ class MenuCardMaster(models.Model):
 
 # sdo master
 class SdoMaster(models.Model):
-    sdo_name = models.CharField(max_length=50, null=False, unique=True)
+    sdo_name = models.CharField(max_length=100, null=False, unique=True)
     sdo_email = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sdo_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)
@@ -230,7 +231,7 @@ class MenuSdoMapping(models.Model):
 # expert master
 class ExpertMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    expert_account_id = models.CharField(max_length=80, null=False)
+    expert_account_id = models.CharField(max_length=100, null=False)
     expert_name = models.CharField(max_length=100, null=False, unique=True)
     expert_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expert_created_by')
@@ -246,7 +247,7 @@ class ExpertMaster(models.Model):
 # creator master
 class CreatorMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    creator_account_id = models.CharField(max_length=80, null=False)
+    creator_account_id = models.CharField(max_length=100, null=False)
     creator_name = models.CharField(max_length=100, null=False, unique=True)
     creator_email = models.CharField(max_length=255, null=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='creator_created_by')
@@ -295,7 +296,7 @@ class ReportStatusMaster(models.Model):
 # Product master
 class ProductMaster(models.Model):
     id = models.AutoField(primary_key=True)
-    product_name = models.CharField(max_length=50, null=False, unique=True)
+    product_name = models.CharField(max_length=100, null=False, unique=True)
     product_description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_created_by')
     created_date = models.DateTimeField(auto_now_add=True, null=False)

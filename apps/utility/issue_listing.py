@@ -107,8 +107,8 @@ def issue_list_data(request):
     # customfield_16265 => SNow Request Item No
     # set the initial parameters
     # Specify the start and end parameters
-    start_at = 0
-    end_at = 24  # Fetching 25 records (0-based index)
+    startAt = 0
+    maxResults = 10  # Fetching 25 records (0-based index)
 
     payload = {
         "expand": [
@@ -135,16 +135,12 @@ def issue_list_data(request):
             "creator",
             "subtask",
             "comment"
-        ],
-        "maxResults": 25,
-        "startAt": 0
+        ]
     }
     # Initialize an empty list to store the extracted data
     data_list = []
-    payload['maxResults'] = 25
-
-    payload['startAt'] = start_at
-    
+    payload['maxResults'] = maxResults
+    payload['startAt'] = startAt
     response = requests.request(
         "POST",
         url,
@@ -155,18 +151,16 @@ def issue_list_data(request):
     )
 
     json_file_path = "apps/dashboard/findproductcap.json"
-    response.status_code = 200
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        # Load the JSON data from the file
         data = json.load(json_file)
-    #response.text = data
-    #modified_content = data
     # check if the request response was successful
     #if response.status_code == 200:
     if True:
-        #issues_data = json.loads(data)
+        #issues_data = json.loads(response.text)
         issues_data = data
+        #total_records = issues_data['total']
+
         # Insert data into Django model
         for issue in issues_data['issues']:
             menu_card = ''
