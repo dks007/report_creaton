@@ -14,6 +14,7 @@ from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -25,6 +26,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# cors allow setting
+CORS_ORIGIN_ALLOW_ALL = True
+
+# allow all host
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -37,12 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'drf_yasg',
     'apps.accounts',
-    'apps.dashboard',
+    'apps.dashboard'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,13 +207,14 @@ AUTHENTICATION_CLASSES = [
     'account.backends.AzureADAuthentication',
 ]
 
-# Celery configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_ACCEPT_CONTENT = ['json']
+# CELERY SETUP
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_RESULT_EXPIRES = 60 * 60 * 24  # 1 day
+
+#CELERY_TASK_RESULT_EXPIRES = 60 * 60 * 24  # 1 day
 CELERY_TIMEZONE = 'UTC'
 CELERY_ENABLE_UTC = True
 
