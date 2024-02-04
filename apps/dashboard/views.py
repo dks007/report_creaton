@@ -26,7 +26,7 @@ def get_issue_list(request):
         start = request.GET.get('start')
         max_result = request.GET.get('max_result')
         response, total_record = issue_list_data(start, max_result)
-        return JsonResponse({'data': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
+        return JsonResponse({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
@@ -37,7 +37,7 @@ def get_issue_details(request, id):
     """
     if request.method == 'GET':
         response = issue_details_data(id)
-        return JsonResponse({'data': response, 'status': status.HTTP_200_OK})
+        return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
@@ -55,7 +55,7 @@ class MenuViewSet(viewsets.ModelViewSet):
         """
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
+        return Response({'resdata': serializer.data, 'status': status.HTTP_200_OK})
 
     def retrieve(self, request, *args, **kwargs):
         """
@@ -63,7 +63,7 @@ class MenuViewSet(viewsets.ModelViewSet):
         """
         instance = self.get_queryset().filter(id=kwargs.get('pk')).first()
         serializer = self.get_serializer(instance)
-        return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
+        return Response({'resdata': serializer.data, 'status': status.HTTP_200_OK})
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -79,7 +79,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
-        return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
+        return Response({'resdata': serializer.data, 'status': status.HTTP_200_OK})
 
 
 class CapabilityViewSet(viewsets.ModelViewSet):
