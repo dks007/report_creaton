@@ -52,7 +52,7 @@ def issue_list_data(startAt=0, maxResults=10):
             "parent",
             "created",
             "creator",
-            "subtask",
+            "subtasks",
             "comment"
         ]
     }
@@ -213,7 +213,7 @@ def issue_list_data(startAt=0, maxResults=10):
             if sdo_map:
                 dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else 'NA'
             if report_data:
-                dt['report_status'] = report_data.report_status.id
+                dt['report_status'] = str(report_data.report_status.id)
                 dt['report_error'] = report_data.error_msg
             else:
                 dt['report_status'] = '0'
