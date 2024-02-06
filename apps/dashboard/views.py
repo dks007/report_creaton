@@ -11,6 +11,7 @@ from rest_framework.response import Response
 # local import
 from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
     SubCapabilitySerializer, SuccessReportSerializer
+from ..accounts.permissions import IFSPermission
 from ..utility.issue_listing import issue_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
@@ -23,8 +24,8 @@ def get_issue_list(request):
     used to fetch all issues
     """
     if request.method == 'GET':
-        #start = request.GET.get('start')
-        #max_result = request.GET.get('max_result')
+        # start = request.GET.get('start')
+        # max_result = request.GET.get('max_result')
         start = 0
         max_result = 30
         response, total_record = issue_list_data(start, max_result)
@@ -138,6 +139,7 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
     """
     queryset = SuccessReport.objects.all()
     serializer_class = SuccessReportSerializer
+    permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -147,3 +149,17 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
         serializer.is_valid()
         serializer.save()
         return Response({'msg': 'success-report created successfully!', 'status': status.HTTP_201_CREATED})
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_queryset().filter(id=kwargs.get('pk')).first()
+        if instance is not None:
+            serializer = self.get_serializer_class()(instance, data=request.data, partial=True)
+            serializer.is_valid()
+            serializer.save()
+            return Response({'msg': 'success-report updated successfully!', 'status': status.HTTP_200_OK})
+        return Response({'msg': 'Not Found', 'status': status.HTTP_404_NOT_FOUND})
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_queryset().filter(id=kwargs.get('pk')).first()
+        serializer = self.get_serializer_class()(instance)
+        return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
