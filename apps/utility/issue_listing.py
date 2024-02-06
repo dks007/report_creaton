@@ -2,7 +2,7 @@
 from requests.auth import HTTPBasicAuth
 import requests, os, json
 from apps.dashboard.models import SuccessReport
-from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping
+from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 import django
 django.setup()
@@ -69,25 +69,29 @@ def issue_list_data(startAt=0, maxResults=10):
         verify=False
     )
 
-    #json_file_path = "/home/rafique/Desktop/reporting/apps/utility/findproductcap.json"
     json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file)
+        data = json.load(json_file) 
     # check if the request response was successful
     #if response.status_code == 200:
     if True:
         #issues_data = json.loads(response.text)
         issues_data = data
         total_records = issues_data['total']
-
+        #call menu card from MenucardMaster database
+        menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         # Insert data into Django model
         for issue in issues_data['issues']:
-            menu_card = ''
+            menu_card = None
+            partner = False
             menu_description = ''
-            partner = ''
             customer_id = ''
             activit_project_id = ''
+            capability=''
+            product=''
+            product_version=''
+            frequency=''
             changelog = issue.get("changelog", {}).get("histories", [])
             changelog_assignee_created = None
 
@@ -98,7 +102,7 @@ def issue_list_data(startAt=0, maxResults=10):
 
               
             if description: 
-                capability, product_name, product_version, frequency=utils.get_productCapability(description)
+                capability, product, product_version, frequency=utils.get_productCapability(description)
 
             # Extract assignee and created date from changelog
             for history in changelog:
@@ -114,6 +118,11 @@ def issue_list_data(startAt=0, maxResults=10):
             issue_key = issue.get("key", "")
             created = issue["fields"].get('created', "")
             created = utils.convert_date(created)
+            parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
+            parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
+            parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
+                "fields"] else None
+
             activity_short_name = issue["fields"].get("customfield_16036", "")
             if activity_short_name and '.' in activity_short_name:
                 activity_split_string = activity_short_name.split('.')
@@ -122,17 +131,21 @@ def issue_list_data(startAt=0, maxResults=10):
                 # getting activit menuid string
                 activit_menu_string = activity_split_string[2]
                 # call function to get menu id and partner
-                menu_card, partner = utils.find_menuid_in_string(activit_menu_string)
-            else:
-                menu_card, partner = utils.find_menuid_in_string(issue_summary)
+                menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
+                #print("menu_card1111->",issue_key,menu_card)
+            if menu_card is None:
+                menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
+                #print("menu_card2222->",issue_key,menu_card)
+            if menu_card is None:
+                menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
+                #print("menu_card333->",issue_key,menu_card)
+            if menu_card is None:
+                menu_card = None
+                partner = False
 
             changelog_assignee_created = utils.convert_date(changelog_assignee_created)
             creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
-
             menu_card = menu_card
-            # if menu_card :
-            # menu_description = getmenudescription()
-
             partner = partner
             activit_project_id = activit_project_id
             project_id = issue["fields"]["project"].get("id", "")
@@ -146,11 +159,7 @@ def issue_list_data(startAt=0, maxResults=10):
                 "customfield_16264"] else None
             customer_contact = issue["fields"].get("customfield_16032", "")
             snow_request_no = issue["fields"].get("customfield_16265", "")
-            parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
-            parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
-            parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
-                "fields"] else None
-
+            
             subtask = issue["fields"]["issuetype"].get("subtask", "")
 
             assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue[
@@ -174,7 +183,7 @@ def issue_list_data(startAt=0, maxResults=10):
                 "partner": partner,
                 "subtask": subtask,
                 "capability": capability,
-                "product_name": product_name,
+                "product": product,
                 "product_version": product_version,  
                 "project_id": project_id,
                 "project_key": project_key,
@@ -205,7 +214,7 @@ def issue_list_data(startAt=0, maxResults=10):
         json_data = json.dumps(data_list, indent=2)
         response = json.loads(json_data)
         for dt in response:
-            desc = utils.MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
+            desc = MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
             report_data = SuccessReport.objects.filter(jira_key=dt.get('issue_key')).first()
             customer_map = CustomerMapping.objects.filter(customer__customer_id=dt.get('customer_id')).first()
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=dt.get('menu_card')).first()
