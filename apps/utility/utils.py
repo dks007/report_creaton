@@ -1,4 +1,3 @@
-from apps.dashboard.models.masters import MenuCardMaster
 from datetime import datetime
 # common functions used by various apps
 def convert_date(date_str):
@@ -39,8 +38,8 @@ def get_productCapability(json_data):
 
     for content_item in json_data.get("content", []):
         if content_item.get("type") == "paragraph":
+            
             text_items = [item.get("text", "") for item in content_item.get("content", [])]
-
             for i in range(len(text_items)):
                 line = text_items[i].strip()
 
@@ -60,7 +59,7 @@ def get_productCapability(json_data):
 
                 if line.lower().startswith("frequency:"):
                     frequency = line.split(":")[1].strip()
-
+    
     return capability, product_name, product_version, frequency    
 # function to get subtasks list
 def extract_subtasks_data(subtasks):
@@ -80,17 +79,19 @@ def extract_subtasks_data(subtasks):
 
 
 # Function to find the menu id and partner from activity short menu
-def find_menuid_in_string(match_str):
-    menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
-    matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
-    longest_matching_value = ''
-    p_is_after_match = ''
-    longest_matching_value = max(matching_values, key=len, default=None)
+def find_menuid_in_string(match_str,menuList):
+    if match_str:
+        matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
+        longest_matching_value = ''
+        p_is_after_match = ''
+        longest_matching_value = max(matching_values, key=len, default=None)
 
-    if longest_matching_value is not None:
-        index_of_match = match_str.find(longest_matching_value)
-        p_is_after_match = (
-                                   index_of_match + len(longest_matching_value) < len(match_str)) and (
-                                   match_str[index_of_match + len(longest_matching_value)] == 'P')
-        return longest_matching_value, p_is_after_match
-    return None, False
+        if longest_matching_value is not None:
+            index_of_match = match_str.find(longest_matching_value)
+            p_is_after_match = (
+                                    index_of_match + len(longest_matching_value) < len(match_str)) and (
+                                    match_str[index_of_match + len(longest_matching_value)] == 'P')
+            return longest_matching_value, p_is_after_match
+        return None, False
+    else:
+        return None, False

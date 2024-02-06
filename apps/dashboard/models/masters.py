@@ -64,14 +64,14 @@ class CSMMaster(BaseModel):
 
 class SDMMaster(BaseModel):
     sdm_name = models.CharField(max_length=100, unique=True)
-    sdm_email = models.CharField(max_length=255)
+    sdm_email = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.sdm_name
 
 class PSMMaster(BaseModel):
     psm_name = models.CharField(max_length=50, unique=True)
-    psm_email = models.CharField(max_length=255)
+    psm_email = models.CharField(max_length=255,blank=True)
 
     def __str__(self):
         return self.psm_name
@@ -98,10 +98,10 @@ class SuccessServiceMaster(BaseModel):
 class MenuCardMaster(BaseModel):
     menu_card = models.CharField(max_length=10, unique=True)
     menu_description = models.TextField()
-    template_file_name = models.CharField(max_length=255, null=True)
-    template_file_path = models.TextField(null=True)
-    template_file_type = models.CharField(max_length=10, null=True)
-    template_file_size = models.IntegerField(null=True)
+    template_file_name = models.CharField(max_length=255, null=True, blank=True)
+    template_file_path = models.TextField(null=True, blank=True)
+    template_file_type = models.CharField(max_length=10, null=True, blank=True)
+    template_file_size = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"MenuCardMaster {self.id} - {self.menu_card}"

@@ -23,8 +23,10 @@ def get_issue_list(request):
     used to fetch all issues
     """
     if request.method == 'GET':
-        start = request.GET.get('start')
-        max_result = request.GET.get('max_result')
+        #start = request.GET.get('start')
+        #max_result = request.GET.get('max_result')
+        start = 0
+        max_result = 30
         response, total_record = issue_list_data(start, max_result)
         return JsonResponse({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
     else:
