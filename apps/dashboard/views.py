@@ -24,22 +24,18 @@ def get_issue_list(request):
     used to fetch all issues
     """
     if request.method == 'GET':
-        # start = request.GET.get('start')
-        # max_result = request.GET.get('max_result')
-        start = 0
-        max_result = 30
-        response, total_record = issue_list_data(start, max_result)
+        response, total_record = issue_list_data(request)
         return JsonResponse({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
 
-def get_issue_details(request, id):
+def get_issue_details(request):
     """
     used to fetch specific issue
     """
     if request.method == 'GET':
-        response = issue_details_data(id)
+        response, total_record = issue_details_data(request)
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})

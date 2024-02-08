@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 # common functions used by various apps
 def convert_date(date_str):
     if date_str is None:
@@ -79,7 +80,7 @@ def extract_subtasks_data(subtasks):
 
 
 # Function to find the menu id and partner from activity short menu
-def find_menuid_in_string(match_str,menuList):
+""" def find_menuid_in_string(match_str,menuList):
     if match_str:
         matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
         longest_matching_value = ''
@@ -94,4 +95,16 @@ def find_menuid_in_string(match_str,menuList):
             return longest_matching_value, p_is_after_match
         return None, False
     else:
-        return None, False
+        return None, False """
+# getting menu card and partner by given string
+def find_menuid_in_string(match_str,menuList):
+    if match_str:
+        match_str = match_str.strip()  # Trim leading and trailing whitespace
+        tokens = re.findall(r'(?:QSM|SAA|EMA|TAA)\d+', match_str)  # Extract tokens starting with series prefixes followed by digits
+        for token in tokens:
+            if token in menuList:
+                index_of_match = match_str.find(token)
+                if index_of_match != -1:  # Check if token is found in match_str
+                    is_p_after_match = (index_of_match + len(token) < len(match_str)) and (match_str[index_of_match + len(token)] == 'P')
+                    return token, is_p_after_match
+    return None, False
