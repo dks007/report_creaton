@@ -1,65 +1,27 @@
 # success_tool/tasks.py
+import requests
+import json
 from requests.auth import HTTPBasicAuth
-import requests, os, json
+import os
+import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
-import django
-django.setup()
+from datetime import datetime
 from apps.utility import utils
+from .jqlconfig import headers, auth
+from .jqlpayload import construct_payload
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
+django.setup()
 
 # Get issue list data from Jira API and success tool database
-def issue_list_data(startAt=0, maxResults=10):
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
-    url = os.getenv('JIRA_URL')
-    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
-    # cutome fields names
-    # customfield_16032 => customer contact
-    # customfield_16015 => start date
-    # customfield_16036 => Activit Short name
-    # customfield_16262 => Customer email
-    # customfield_16263 => customer contact number
-    # customfield_16264 => custome region/location
-    # customfield_16265 => SNow Request Item No
-    # set the initial parameters
-    # Specify the start and end parameters
-    # startAt = 0
-    # maxResults = 10  # Fetching 25 records (0-based index)
+def issue_list_data(request):
+   # Construct payload using jqlpayload.py
+    payload = construct_payload(request)
 
-    payload = {
-        "expand": [
-            "changelog"
-        ],
-        "jql": "issuetype in (Sub-task, Tasks) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') AND 'Service Category[Dropdown]' = 'Expert Services' AND assignee NOT in (EMPTY) order by created DESC",
-        "fieldsByKeys": False,
-        "fields": [
-            "summary",
-            "description",
-            "project",
-            "customfield_16032",
-            "customfield_16015",
-            "customfield_16036",
-            "customfield_16262",
-            "customfield_16263",
-            "customfield_16264",
-            "customfield_16265",
-            "assignee",
-            "issuetype",
-            "status",
-            "parent",
-            "created",
-            "creator",
-            "subtasks",
-            "comment"
-        ]
-    }
-    # Initialize an empty list to store the extracted data
-    data_list = []
-    payload['maxResults'] = maxResults
-    payload['startAt'] = startAt
+    url = os.getenv('JIRA_URL')
+
+    # Send request to Jira API
     response = requests.request(
         "POST",
         url,
@@ -68,7 +30,7 @@ def issue_list_data(startAt=0, maxResults=10):
         data=json.dumps(payload),
         verify=False
     )
-
+    data_list=[]
     json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
@@ -109,7 +71,7 @@ def issue_list_data(startAt=0, maxResults=10):
                 for item in history.get("items", []):
                     if item.get("field") == "assignee":
                         created_date_str = history.get("created", "")
-                        created_date = utils.datetime.strptime(created_date_str, "%Y-%m-%dT%H:%M:%S.%f%z")
+                        created_date = datetime.strptime(created_date_str, "%Y-%m-%dT%H:%M:%S.%f%z")
                         if changelog_assignee_created is None or created_date < changelog_assignee_created:
                             changelog_assignee_created = created_date
 

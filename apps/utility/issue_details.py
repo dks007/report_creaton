@@ -1,101 +1,43 @@
 from requests.auth import HTTPBasicAuth
 import requests
-import json
-import csv
-import time
-from datetime import datetime
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
+import json
+from datetime import datetime
+from apps.dashboard.models import SuccessReport
+from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
+from apps.utility import utils
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 import django
+
 django.setup()
 
-from apps.dashboard.models import MenuCardMaster
+def issue_details_data(request):
+    """
+    Fetches issue data from Jira API and populates a Django model with the extracted data.
 
+    Args:
+        issue_key (str): jira issue key
 
-def convert_date(date_str):
-    if date_str is None:
-        return None
-        # Define input and output formats
-    input_formats = ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S.%f%z"]
-
-    output_format = "%d %b %Y"
-
-    # If the input is already a datetime object, use it directly
-    if isinstance(date_str, datetime):
-        parsed_date = date_str
-    else:
-        # Try parsing the input date using each format
-        for format_str in input_formats:
-            try:
-                parsed_date = datetime.strptime(date_str, format_str)
-                # If parsing is successful, break out of the loop
-                break
-            except ValueError:
-                pass
-        else:
-            # If none of the formats work, raise an error
-            raise ValueError("Invalid date format")
-
-    # Format the date in the desired output format
-    formatted_date = parsed_date.strftime(output_format)
-
-    return formatted_date
-
-
-def format_date(input_date, input_format="%Y-%m-%dT%H:%M:%S.%f%z"):
-    if input_date is None:
-        return None
-    if isinstance(input_date, datetime):
-        # If the input is already a datetime object, just format it
-        formatted_date = input_date.strftime("%-d %b %Y")
-        return formatted_date
-
-    try:
-        # Parse the input date string
-        parsed_date = datetime.strptime(input_date, input_format)
-
-        # Truncate microseconds and format the date using f-string
-        parsed_date = parsed_date.replace(microsecond=0)
-        formatted_date = f"{parsed_date.day} {parsed_date.strftime('%b %Y')}"
-        return formatted_date
-
-    except ValueError as e:
-        # Handle the case where the input date string is not in the expected format
-        print(f"Error: {e}")
-        return None
-
-    # def getCustomerId(proectKey):
-
-
-# Function to find the menu id and partner from activity short menu
-def find_menuid_in_string(match_str):
-    menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
-    # need to fetch from database dashboard_menusdo
-    matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
-    longest_matching_value = ''
-    p_is_after_match = ''
-    longest_matching_value = max(matching_values, key=len, default=None)
-
-    if longest_matching_value is not None:
-        index_of_match = match_str.find(longest_matching_value)
-        p_is_after_match = (
-                                   index_of_match + len(longest_matching_value) < len(match_str)) and (
-                                   match_str[index_of_match + len(longest_matching_value)] == 'P')
-        return longest_matching_value, p_is_after_match
-    return None, False
-
-
-def issue_details_data(iss_id):
-    MAX_DURATION_SECONDS = 60
-
-    # issueId = 1990817
-
+    Returns:
+        tuple: response data provide individual records of issue key.
+    """
+    # Getting request
+    issue_key = request.GET.get('issue_key')
+    emailId = "dilip.kumar.shrivastwa@ifs.com"
+    
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    url = os.getenv('JIRA_URL')
+    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
+    # Construct the JQL query with dynamic values
+    jql_query = "issuetype in (Sub-task, Task) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') " \
+            "AND 'Service Category[Dropdown]' = 'Expert Services' AND key = '{}' AND assignee = '{}'".format(issue_key, emailId)
     payload = {
-        "expand": [
-            "changelog"
-        ],
-        "jql": f"issuetype in (Sub-task, Tasks) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') AND 'Service Category[Dropdown]' = 'Expert Services' AND key in({iss_id}) AND assignee NOT in (EMPTY) order by created DESC",
+        "expand": ["changelog"],
+        "jql": jql_query,
         "fieldsByKeys": False,
         "fields": [
             "summary",
@@ -114,48 +56,45 @@ def issue_details_data(iss_id):
             "parent",
             "created",
             "creator",
-            "subtask",
+            "subtasks",
             "comment"
         ]
     }
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
-
-    url = os.getenv('JIRA_URL')
-    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
-    # cutome fields names
-    # customfield_16032 => customer contact
-    # customfield_16015 => start date
-    # customfield_16036 => Activit Short name
-    # customfield_16262 => Customer email
-    # customfield_16263 => customer contact number
-    # customfield_16264 => custome region/location
-    # customfield_16265 => SNow Request Item No
-    # set the initial parameters
-    # Specify the start and end parameters
 
     response = requests.request(
         "POST",
         url,
         headers=headers,
-        data=json.dumps(payload),
         auth=auth,
+        data=json.dumps(payload),
         verify=False
     )
 
-    # check if the request response was successful
     if response.status_code == 200:
-        issues_data = json.loads(response.text)
-        issue = issues_data['issues'][0]
-        menu_card = ''
+        issue_data = json.loads(response.text)
+        total_records = issue_data['total']
+        issue = issue_data['issues'][0]  # Extracting the single issue
+
+        menu_card = None
+        partner = False
         menu_description = ''
-        partner = ''
         customer_id = ''
         activit_project_id = ''
+        capability=''
+        product=''
+        product_version=''
+        frequency=''
         changelog = issue.get("changelog", {}).get("histories", [])
         changelog_assignee_created = None
+
+            #get subtask list
+        subtasks = issue["fields"].get('subtasks', [])
+        subtasks_list = utils.extract_subtasks_data(subtasks)
+        description = issue["fields"].get('description', "")
+
+            
+        if description: 
+            capability, product, product_version, frequency=utils.get_productCapability(description)
 
         # Extract assignee and created date from changelog
         for history in changelog:
@@ -170,7 +109,12 @@ def issue_details_data(iss_id):
         issue_id = issue.get("id", "")
         issue_key = issue.get("key", "")
         created = issue["fields"].get('created', "")
-        created = convert_date(created)
+        created = utils.convert_date(created)
+        parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
+        parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
+        parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
+            "fields"] else None
+
         activity_short_name = issue["fields"].get("customfield_16036", "")
         if activity_short_name and '.' in activity_short_name:
             activity_split_string = activity_short_name.split('.')
@@ -179,17 +123,21 @@ def issue_details_data(iss_id):
             # getting activit menuid string
             activit_menu_string = activity_split_string[2]
             # call function to get menu id and partner
-            menu_card, partner = find_menuid_in_string(activit_menu_string)
-        else:
-            menu_card, partner = find_menuid_in_string(issue_summary)
+            menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
+            #print("menu_card1111->",issue_key,menu_card)
+        if menu_card is None:
+            menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
+            #print("menu_card2222->",issue_key,menu_card)
+        if menu_card is None:
+            menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
+            #print("menu_card333->",issue_key,menu_card)
+        if menu_card is None:
+            menu_card = None
+            partner = False
 
-        changelog_assignee_created = convert_date(changelog_assignee_created)
+        changelog_assignee_created = utils.convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
-
         menu_card = menu_card
-        # if menu_card :
-        # menu_description = getmenudescription()
-
         partner = partner
         activit_project_id = activit_project_id
         project_id = issue["fields"]["project"].get("id", "")
@@ -203,11 +151,7 @@ def issue_details_data(iss_id):
             "customfield_16264"] else None
         customer_contact = issue["fields"].get("customfield_16032", "")
         snow_request_no = issue["fields"].get("customfield_16265", "")
-        parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
-        parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
-        parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
-            "fields"] else None
-
+        
         subtask = issue["fields"]["issuetype"].get("subtask", "")
 
         assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue[
@@ -220,49 +164,63 @@ def issue_details_data(iss_id):
         issue_status = issue["fields"]["status"].get("name", "")
 
         # Create an Issue instance
-        issue_fields = {
+        issue_data_dict = {
             "issue_key": issue_key,
             "issue_summary": issue_summary,
             "menu_card": menu_card,
             "menu_description": menu_description,
             "activity_short_name": activity_short_name,
+            "activit_project_id": activit_project_id,
+            "subtasks_list": subtasks_list,
             "partner": partner,
-            # "activit_project_id": activit_project_id,
+            "subtask": subtask,
+            "capability": capability,
+            "product": product,
+            "product_version": product_version,  
             "project_id": project_id,
             "project_key": project_key,
             "customer_id": customer_id,
             "project_name": project_name,
-            # "customer_email": customer_email,
+            "customer_email": customer_email,
             "customer_contact_no": customer_contact_no,
             "customer_contact": customer_contact,
             "customer_location": customer_location,
-            # "snow_request_no": snow_request_no,
-            # "issue_id": issue_id,
-            "created": created,
-            "changelog_assignee_created": changelog_assignee_created if changelog_assignee_created else None,
-            # "creator_email": creator_email,
-            # "parent_id": parent_id,
-            # "parent_key": parent_key,
+            "snow_request_no": snow_request_no,
+            "issue_id": issue_id,
+            "created_date": created,
+            "assign_date": changelog_assignee_created if changelog_assignee_created else None,
+            "creator_email": creator_email,
+            "parent_id": parent_id,
+            "parent_key": parent_key,
             "parent_summary": parent_summary,
-            "subtask": subtask,
-            # "assignee_email": assignee_email,
+            "assignee_email": assignee_email,
             "assignee_name": assignee_name,
-            # "assignee_id": assignee_id,
+            "assignee_id": assignee_id,
             "issue_status": issue_status
         }
 
-        # Save the instance to the csv
-        # data_list.append(issue_fields)
+        # Additional processing and enriching the issue_data_dict 
+        for dt in issue_data_dict:
+            desc = MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
+            report_data = SuccessReport.objects.filter(jira_key=dt.get('issue_key')).first()
+            customer_map = CustomerMapping.objects.filter(customer__customer_id=dt.get('customer_id')).first()
+            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=dt.get('menu_card')).first()
 
-        # Convert the list of dictionaries to a JSON string
-        # json_data = json.dumps(issue_fields, indent=2)
-        # Print or save the JSON data as needed
-        print(issue_fields)
-        print("Data has been fetched successfully!")
-        return issue_fields
+            if sdo_map:
+                dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else 'NA'
+            if report_data:
+                dt['report_status'] = str(report_data.report_status.id)
+                dt['report_error'] = report_data.error_msg
+            else:
+                dt['report_status'] = '0'
+            if desc is not None:
+                dt['menu_description'] = desc.menu_description
+            if customer_map:
+                dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else 'NA'
+                dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else 'NA'
+                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else 'NA'
 
-
+        return [issue_data_dict], total_records  # Returning a list with a single record and total count
 
     else:
-        # print an error if the request was not successful
-        print(f"Failed to retrieve data. Status code: {response.status_code}")
+        return [], 0
