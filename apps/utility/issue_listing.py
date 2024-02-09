@@ -1,4 +1,3 @@
-# success_tool/tasks.py
 import requests
 import json
 from requests.auth import HTTPBasicAuth
@@ -10,6 +9,7 @@ from datetime import datetime
 from apps.utility import utils
 from .jqlconfig import headers, auth
 from .jqlpayload import construct_payload
+from .issue_bykey import issue_bykey
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
@@ -98,6 +98,15 @@ def issue_list_data(request):
             if menu_card is None:
                 menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
                 #print("menu_card2222->",issue_key,menu_card)
+            if menu_card is None and parent_key is not None:
+                #getting parent activity short name
+                parent_activity_string = issue_bykey(parent_key)
+                if parent_activity_string:
+                    parent_activity_name = parent_activity_string.split('.')
+                    # getting activity project id
+                    parent_activit_id = parent_activity_name[0]
+                    menu_card, partner = utils.find_menuid_in_string(parent_activit_id,menuList)
+                    #print("menu_card333->",issue_key,menu_card)
             if menu_card is None:
                 menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
                 #print("menu_card333->",issue_key,menu_card)
@@ -198,4 +207,4 @@ def issue_list_data(request):
         return response, total_records
 
     else:
-       return response, 0
+       return [], 0

@@ -1,15 +1,16 @@
-from requests.auth import HTTPBasicAuth
 import requests
-import os
 import json
-from datetime import datetime
+from requests.auth import HTTPBasicAuth
+import os
+import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
+from datetime import datetime
 from apps.utility import utils
+from .jqlconfig import headers, auth
+from .jqlpayload import construct_payload
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
-import django
-
 django.setup()
 
 def issue_details_data(request):
@@ -22,45 +23,14 @@ def issue_details_data(request):
     Returns:
         tuple: response data provide individual records of issue key.
     """
+     # Construct payload using jqlpayload.py
+    payload = construct_payload(request)
     # Getting request
     issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
     
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
     url = os.getenv('JIRA_URL')
-    auth = HTTPBasicAuth(os.getenv('JIRA_EMAIL'), os.getenv('JIRA_TOKEN'))
-    # Construct the JQL query with dynamic values
-    jql_query = "issuetype in (Sub-task, Task) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') " \
-            "AND 'Service Category[Dropdown]' = 'Expert Services' AND key = '{}' AND assignee = '{}'".format(issue_key, emailId)
-    payload = {
-        "expand": ["changelog"],
-        "jql": jql_query,
-        "fieldsByKeys": False,
-        "fields": [
-            "summary",
-            "description",
-            "project",
-            "customfield_16032",
-            "customfield_16015",
-            "customfield_16036",
-            "customfield_16262",
-            "customfield_16263",
-            "customfield_16264",
-            "customfield_16265",
-            "assignee",
-            "issuetype",
-            "status",
-            "parent",
-            "created",
-            "creator",
-            "subtasks",
-            "comment"
-        ]
-    }
-
+    # Send request to Jira API
     response = requests.request(
         "POST",
         url,

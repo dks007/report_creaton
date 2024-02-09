@@ -11,7 +11,8 @@ def construct_payload(request):
     endDate = request.GET.get('endDate')
     sortBy = request.GET.get('sortBy', 'created')  # Default value: 'created'
     order = request.GET.get('order', 'DESC')  # Default value: 'DESC'
-    issueType = request.GET.get('issueType', 'Sub-task, Task')  # Default value: 'Sub-task, Task'
+    issueType = request.GET.get('issueType', 'Sub-task, Tasks')  # Default value: 'Sub-task, Task'
+    issueKey = request.GET.get('issueKey', None)  # Filter by Issue Key
     status = request.GET.get('status', "('Awaiting Customer', 'In Process','In Review','Not Started')")  # Default value: "('Awaiting Customer', 'In Process','In Review','Not Started')"
 
     payload = {
@@ -39,6 +40,9 @@ def construct_payload(request):
             "comment"
         ]
     }
+
+    if issueKey is not None:
+        payload['jql'] = f"key in {issueKey}"
 
     if filterByCreatedDate and startDate and endDate:
         start_date_str = datetime.strptime(startDate, "%Y-%m-%d").strftime("%Y-%m-%d")
