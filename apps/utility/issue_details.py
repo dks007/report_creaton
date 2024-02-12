@@ -13,7 +13,7 @@ from .jqlpayload import construct_payload
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
-def issue_details_data(request):
+def issue_details_data(request,id):
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 
@@ -24,11 +24,11 @@ def issue_details_data(request):
         tuple: response data provide individual records of issue key.
     """
      # Construct payload using jqlpayload.py
-    payload = construct_payload(request)
+    payload = construct_payload(request,id)
     # Getting request
     issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
-    
+
     url = os.getenv('JIRA_URL')
     # Send request to Jira API
     response = requests.request(
