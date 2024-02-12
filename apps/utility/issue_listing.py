@@ -98,6 +98,9 @@ def issue_list_data(request):
             if menu_card is None:
                 menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
                 #print("menu_card2222->",issue_key,menu_card)
+            if menu_card is None:
+                menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
+                #print("menu_card333->",issue_key,menu_card)
             if menu_card is None and parent_key is not None:
                 #getting parent activity short name
                 parent_activity_string = issue_bykey(parent_key)
@@ -107,9 +110,6 @@ def issue_list_data(request):
                     parent_activit_id = parent_activity_name[0]
                     menu_card, partner = utils.find_menuid_in_string(parent_activit_id,menuList)
                     #print("menu_card333->",issue_key,menu_card)
-            if menu_card is None:
-                menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
-                #print("menu_card333->",issue_key,menu_card)
             if menu_card is None:
                 menu_card = None
                 partner = False

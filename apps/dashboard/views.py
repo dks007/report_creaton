@@ -30,12 +30,12 @@ def get_issue_list(request):
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
 
-def get_issue_details(request):
+def get_issue_details(request,id):
     """
     used to fetch specific issue
     """
     if request.method == 'GET':
-        response, total_record = issue_details_data(request)
+        response, total_record = issue_details_data(request,id)
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
