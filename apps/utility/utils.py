@@ -97,14 +97,22 @@ def extract_subtasks_data(subtasks):
     else:
         return None, False """
 # getting menu card and partner by given string
-def find_menuid_in_string(match_str,menuList):
+def find_menuid_in_string(match_str, menuList):
     if match_str:
         match_str = match_str.strip()  # Trim leading and trailing whitespace
-        tokens = re.findall(r'(?:QSM|SAA|EMA|TAA)\d+', match_str)  # Extract tokens starting with series prefixes followed by digits
-        for token in tokens:
-            if token in menuList:
-                index_of_match = match_str.find(token)
-                if index_of_match != -1:  # Check if token is found in match_str
-                    is_p_after_match = (index_of_match + len(token) < len(match_str)) and (match_str[index_of_match + len(token)] == 'P')
-                    return token, is_p_after_match
+        match = re.search(r'(QSM|SAA|EMA|TAA)(0*\d+)P?', match_str)
+        if match:
+            menu_prefix = match.group(1)
+            menu_number = match.group(2)
+            menu_id_with_zeros = menu_prefix + menu_number
+            menu_id_without_zeros = menu_prefix + str(int(menu_number))  # Convert menu number to integer to remove leading zeros
+            
+            if menu_id_with_zeros in menuList:
+                return menu_id_with_zeros, match.group().endswith('P')
+            elif menu_id_without_zeros in menuList:
+                return menu_id_without_zeros, match.group().endswith('P')
+            else:
+                return None, False
+        else:
+            return None, False
     return None, False
