@@ -35,7 +35,7 @@ def get_issue_details(request,id):
     used to fetch specific issue
     """
     if request.method == 'GET':
-        response, total_record = issue_details_data(request,id)
+        response = issue_details_data(request,id)
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
