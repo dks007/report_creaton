@@ -30,6 +30,7 @@ def construct_payload(request,id=None):
             "customfield_16263",
             "customfield_16264",
             "customfield_16265",
+            "customfield_16266",
             "assignee",
             "issuetype",
             "status",

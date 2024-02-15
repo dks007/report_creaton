@@ -95,12 +95,15 @@ def issue_list_data(request):
                 # call function to get menu id and partner
                 menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
                 #print("menu_card1111->",issue_key,menu_card)
+
             if menu_card is None:
                 menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
                 #print("menu_card2222->",issue_key,menu_card)
+
             if menu_card is None:
                 menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
                 #print("menu_card333->",issue_key,menu_card)
+
             if menu_card is None and parent_key is not None:
                 #getting parent activity short name
                 parent_activity_string = issue_bykey(parent_key)
@@ -110,12 +113,15 @@ def issue_list_data(request):
                     parent_activit_id = parent_activity_name[0]
                     menu_card, partner = utils.find_menuid_in_string(parent_activit_id,menuList)
                     #print("menu_card333->",issue_key,menu_card)
+
             if menu_card is None:
                 menu_card = None
                 partner = False
 
             changelog_assignee_created = utils.convert_date(changelog_assignee_created)
             creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
+            creator_name = issue["fields"]["creator"].get("displayName", "") if "creator" in issue[
+                "fields"] else None
             menu_card = menu_card
             partner = partner
             activit_project_id = activit_project_id
@@ -130,6 +136,7 @@ def issue_list_data(request):
                 "customfield_16264"] else None
             customer_contact = issue["fields"].get("customfield_16032", "")
             snow_request_no = issue["fields"].get("customfield_16265", "")
+            snow_case_no = issue["fields"].get("customfield_16266", "")
             
             subtask = issue["fields"]["issuetype"].get("subtask", "")
 
@@ -165,6 +172,7 @@ def issue_list_data(request):
                 "customer_contact": customer_contact,
                 "customer_location": customer_location,
                 "snow_request_no": snow_request_no,
+                "snow_case_no": snow_case_no,
                 "issue_id": issue_id,
                 "created_date": created,
                 "assign_date": changelog_assignee_created if changelog_assignee_created else None,
@@ -174,6 +182,7 @@ def issue_list_data(request):
                 "parent_summary": parent_summary,
                 "assignee_email": assignee_email,
                 "assignee_name": assignee_name,
+                "creator_name":creator_name,
                 "assignee_id": assignee_id,
                 "issue_status": issue_status
             }
@@ -191,7 +200,7 @@ def issue_list_data(request):
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=dt.get('menu_card')).first()
 
             if sdo_map:
-                dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else 'NA'
+                dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
             if report_data:
                 dt['report_status'] = str(report_data.report_status.id)
                 dt['report_error'] = report_data.error_msg
@@ -200,9 +209,9 @@ def issue_list_data(request):
             if desc is not None:
                 dt['menu_description'] = desc.menu_description
             if customer_map:
-                dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else 'NA'
-                dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else 'NA'
-                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else 'NA'
+                dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
+                dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
 
         return response, total_records
 
