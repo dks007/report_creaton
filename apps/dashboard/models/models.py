@@ -36,6 +36,7 @@ class SuccessReport(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='success_report_updated_by')
     updated_date = models.DateTimeField(auto_now_add=True, null=True)
     report_status = models.ForeignKey(ReportStatusMaster, on_delete=models.CASCADE)
+    snow_case_no = models.CharField(max_length=10, null=True)
 
     def __str__(self):
         return f"SuccessReport {self.id} - Jira Key: {self.jira_key}, Customer: {self.customer.customer_name}, Expert: {self.expert.expert_name}"

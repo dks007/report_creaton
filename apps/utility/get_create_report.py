@@ -146,59 +146,24 @@ def issue_details_data(request,id):
         # Create an Issue instance
         issue_data_dict = {
             "issue_key": issue_key,
-            "issue_summary": issue_summary,
             "menu_card": menu_card,
-            "menu_description": menu_description,
-            "activity_short_name": activity_short_name,
-            "activit_project_id": activit_project_id,
-            "subtasks_list": subtasks_list,
-            "partner": partner,
-            "subtask": subtask,
             "capability": capability,
-            "product": product,
-            "product_version": product_version,  
-            "project_id": project_id,
-            "project_key": project_key,
-            "customer_id": customer_id,
-            "project_name": project_name,
-            "customer_email": customer_email,
-            "customer_contact_no": customer_contact_no,
-            "customer_contact": customer_contact,
-            "customer_location": customer_location,
-            "snow_request_no": snow_request_no,
+            "product": product, 
+            "project_name": project_name,   # customer name/proect name
             "snow_case_no": snow_case_no,
-            "issue_id": issue_id,
-            "created_date": created,
-            "assign_date": changelog_assignee_created if changelog_assignee_created else None,
             "creator_email": creator_email,
-            "parent_id": parent_id,
-            "parent_key": parent_key,
-            "parent_summary": parent_summary,
-            "assignee_email": assignee_email,
-            "assignee_name": assignee_name,
-            "creator_name":creator_name,
-            "assignee_id": assignee_id,
-            "issue_status": issue_status
+            "assignee_name": assignee_name,  # expert name
+            "creator_name":creator_name   # creator name
             }
 
         # Additional processing and enriching the issue_data_dict
-        desc = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-        customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
-        sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
+    
 
-        if sdo_map:
-            issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
         if report_data:
             issue_data_dict['report_status'] = str(report_data.report_status.id)
-            issue_data_dict['report_error'] = report_data.error_msg
+            #issue_data_dict['report_error'] = report_data.error_msg
         else:
             issue_data_dict['report_status'] = '0'
-        if desc is not None:
-            issue_data_dict['menu_description'] = desc.menu_description
-        if customer_map:
-            issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
-            issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
-            issue_data_dict['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
-
+      
         return [issue_data_dict]  # Returning a list with a single record and total count
