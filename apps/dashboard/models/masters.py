@@ -37,7 +37,7 @@ class ProjectMaster(BaseModel):
     project_logo_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.projectid} - {self.project_name}"
+        return f"{self.project_name}"
 
 class CustomerMapping(BaseModel):
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE)

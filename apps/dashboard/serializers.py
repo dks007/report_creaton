@@ -88,3 +88,22 @@ class SuccessReportSerializer(serializers.ModelSerializer):
         validated_data['expert'] = expert
         validated_data['creator'] = creator
         return super().create(validated_data)
+
+
+class SuccessReportSerializer1(serializers.Serializer):
+    """
+    success-report serializer, used to serializer success-report objects,
+    """
+    issue_key = serializers.CharField(max_length=100, required=False)
+    parent_key = serializers.CharField(max_length=100)
+    menu_card = serializers.CharField(max_length=100)
+    capability = serializers.CharField(max_length=100)
+    product = serializers.CharField(max_length=100)
+    expert_name = serializers.CharField(max_length=100)
+    customer_name = serializers.CharField(max_length=100)
+    project_name = serializers.CharField(max_length=100)
+    snow_case_no = serializers.CharField(max_length=100)
+    creator_email = serializers.CharField(max_length=100)
+    assignee_name = serializers.CharField(max_length=100)
+    creator_name = serializers.CharField(max_length=100)
+    action = serializers.CharField(max_length=100, required=False)

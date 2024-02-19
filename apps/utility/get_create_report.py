@@ -13,7 +13,8 @@ from .jqlpayload_details import construct_payload
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
-def issue_details_data(request,id):
+
+def create_report(request, id):
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 
@@ -23,34 +24,34 @@ def issue_details_data(request,id):
     Returns:
         tuple: response data provide individual records of issue key.
     """
-     # Construct payload using jqlpayload.py
-    payload = construct_payload(request,id)
+    # Construct payload using jqlpayload.py
+    payload = construct_payload(request, id)
     # Getting request
     issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
 
-    url = os.getenv('JIRA_URL')
+    # url = os.getenv('JIRA_URL')
     # Send request to Jira API
-    response = requests.request(
-        "POST",
-        url,
-        headers=headers,
-        auth=auth,
-        data=json.dumps(payload),
-        verify=False
-    )
+    # response = requests.request(
+    #     "POST",
+    #     url,
+    #     headers=headers,
+    #     auth=auth,
+    #     data=json.dumps(payload),
+    #     verify=False
+    # )
 
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
+    json_file_path = "/home/rafique/Desktop/reporting/apps/utility/singledata.json"
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file) 
+        data = json.load(json_file)
 
-    #if response.status_code == 200:
+        # if response.status_code == 200:
     if True:
-        #issues_data = json.loads(response.text)
+        # issues_data = json.loads(response.text)
         issues_data = data
         total_records = issues_data['total']
-        #call menu card from MenucardMaster database
+        # call menu card from MenucardMaster database
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         issue = issues_data['issues'][0]  # Extracting the single issue
         menu_card = None
@@ -58,21 +59,20 @@ def issue_details_data(request,id):
         menu_description = ''
         customer_id = ''
         activit_project_id = ''
-        capability=''
-        product=''
-        product_version=''
-        frequency=''
+        capability = ''
+        product = ''
+        product_version = ''
+        frequency = ''
         changelog = issue.get("changelog", {}).get("histories", [])
         changelog_assignee_created = None
 
-            #get subtask list
+        # get subtask list
         subtasks = issue["fields"].get('subtasks', [])
         subtasks_list = utils.extract_subtasks_data(subtasks)
         description = issue["fields"].get('description', "")
 
-            
-        if description: 
-            capability, product, product_version, frequency=utils.get_productCapability(description)
+        if description:
+            capability, product, product_version, frequency = utils.get_productCapability(description)
 
         # Extract assignee and created date from changelog
         for history in changelog:
@@ -101,14 +101,14 @@ def issue_details_data(request,id):
             # getting activit menuid string
             activit_menu_string = activity_split_string[2]
             # call function to get menu id and partner
-            menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
-            #print("menu_card1111->",issue_key,menu_card)
+            menu_card, partner = utils.find_menuid_in_string(activit_menu_string, menuList)
+            # print("menu_card1111->",issue_key,menu_card)
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
-            #print("menu_card2222->",issue_key,menu_card)
+            menu_card, partner = utils.find_menuid_in_string(issue_summary, menuList)
+            # print("menu_card2222->",issue_key,menu_card)
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
-            #print("menu_card333->",issue_key,menu_card)
+            menu_card, partner = utils.find_menuid_in_string(parent_summary, menuList)
+            # print("menu_card333->",issue_key,menu_card)
         if menu_card is None:
             menu_card = None
             partner = False
@@ -116,7 +116,7 @@ def issue_details_data(request,id):
         changelog_assignee_created = utils.convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
         creator_name = issue["fields"]["creator"].get("displayName", "") if "creator" in issue[
-                "fields"] else None
+            "fields"] else None
         menu_card = menu_card
         partner = partner
         activit_project_id = activit_project_id
@@ -148,22 +148,21 @@ def issue_details_data(request,id):
             "issue_key": issue_key,
             "menu_card": menu_card,
             "capability": capability,
-            "product": product, 
-            "project_name": project_name,   # customer name/proect name
+            "product": product,
+            "project_name": project_name,  # customer name/proect name
             "snow_case_no": snow_case_no,
             "creator_email": creator_email,
             "assignee_name": assignee_name,  # expert name
-            "creator_name":creator_name   # creator name
-            }
+            "creator_name": creator_name  # creator name
+        }
 
         # Additional processing and enriching the issue_data_dict
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-    
 
         if report_data:
             issue_data_dict['report_status'] = str(report_data.report_status.id)
-            #issue_data_dict['report_error'] = report_data.error_msg
+            # issue_data_dict['report_error'] = report_data.error_msg
         else:
             issue_data_dict['report_status'] = '0'
-      
+
         return [issue_data_dict]  # Returning a list with a single record and total count

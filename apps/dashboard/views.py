@@ -10,8 +10,10 @@ from rest_framework.response import Response
 
 # local import
 from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
-    SubCapabilitySerializer, SuccessReportSerializer
+    SubCapabilitySerializer, SuccessReportSerializer, SuccessReportSerializer1
 from ..accounts.permissions import IFSPermission
+from ..utility.create_success_report import success_report, convert_json
+from ..utility.get_create_report import create_report
 from ..utility.issue_listing import issue_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
@@ -36,6 +38,32 @@ def get_issue_details(request,id):
     """
     if request.method == 'GET':
         response = issue_details_data(request,id)
+        return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
+    else:
+        return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
+
+
+def get_create_report(request, id):
+    """
+    used to fetch specific issue
+    """
+    if request.method == 'GET':
+        response = SuccessReport.objects.filter(jira_key=id).first()
+        if not response:
+            response = create_report(request, id)
+        else:
+            response = {
+                "issue_key": response.jira_key,
+                "menu_card": response.menu_card.menu_card,
+                "capability": response.capability.capability_name,
+                "product": response.product.product_name,
+                "project_name": response.product.product_name,
+                "snow_case_no": response.snow_case_no,
+                "creator_email": response.creator.creator_email,
+                "assignee_name": "Andreas Andersson",
+                "creator_name": response.creator.creator_name,
+                "report_status": response.report_status.report_status_name
+            }
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
@@ -159,3 +187,15 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
         instance = self.get_queryset().filter(id=kwargs.get('pk')).first()
         serializer = self.get_serializer_class()(instance)
         return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
+
+
+class SuccessReportViewSet1(viewsets.GenericViewSet):
+    serializer_class = SuccessReportSerializer1
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            response = success_report(serializer.validated_data)
+            return Response({'data': convert_json(response[0]), 'status': status.HTTP_201_CREATED})
+        return Response({'msg': 'something went wrong', 'status': status.HTTP_404_NOT_FOUND})
+

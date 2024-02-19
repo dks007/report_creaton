@@ -189,7 +189,7 @@ SWAGGER_SETTINGS = {
         'delete'
     ],
     "api_key": '',
-    "is_authenticated": True,
+    "is_authenticated": False,
     "is_superuser": False,
 
     'SECURITY_DEFINITIONS': {
@@ -220,3 +220,27 @@ CELERY_ENABLE_UTC = True
 
 
 
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "file": {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": "logs/django.log",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["file"],
+#             "level": "INFO",
+#             "propagate": True,
+#         },
+#         "logging_app": {
+#             "handlers": ["file"],
+#             "level": "INFO",
+#             "propagate": True,
+#         },
+#     },
+# }
