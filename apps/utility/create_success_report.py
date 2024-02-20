@@ -1,7 +1,10 @@
 """
 
 """
+import json
+
 from django.contrib.auth.models import User
+from django.core.serializers import serialize
 
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
     SubCapabilityMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster
@@ -60,3 +63,17 @@ def convert_json(response):
     }
 
     return response
+
+
+def all_list():
+    menu_card = MenuCardMaster.objects.all()
+    product = ProductMaster.objects.all()
+    capability = CapabilityMaster.objects.all()
+
+    json_data1 = json.loads(serialize('json', menu_card))
+    json_data2 = json.loads(serialize('json', product))
+    json_data3 = json.loads(serialize('json', capability))
+
+    return json_data1, json_data2, json_data3
+
+

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
     SubCapabilitySerializer, SuccessReportSerializer, SuccessReportSerializer1
 from ..accounts.permissions import IFSPermission
-from ..utility.create_success_report import success_report, convert_json
+from ..utility.create_success_report import success_report, convert_json, all_list
 from ..utility.get_create_report import create_report
 from ..utility.issue_listing import issue_list_data
 from ..utility.issue_details import issue_details_data
@@ -49,8 +49,12 @@ def get_create_report(request, id):
     """
     if request.method == 'GET':
         response = SuccessReport.objects.filter(jira_key=id).first()
+        menu_card, product, capability = all_list()
         if not response:
             response = create_report(request, id)
+            response['menu_card_list'] = menu_card
+            response['product_list'] = product
+            response['capability_list'] = capability
         else:
             response = {
                 "issue_key": response.jira_key,
@@ -62,7 +66,10 @@ def get_create_report(request, id):
                 "creator_email": response.creator.creator_email,
                 "assignee_name": "Andreas Andersson",
                 "creator_name": response.creator.creator_name,
-                "report_status": response.report_status.report_status_name
+                "report_status": response.report_status.report_status_name,
+                "menu_card_list": menu_card,
+                "product_list": product,
+                "capability_list": capability,
             }
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:

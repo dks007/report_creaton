@@ -165,4 +165,4 @@ def create_report(request, id):
         else:
             issue_data_dict['report_status'] = '0'
 
-        return [issue_data_dict]  # Returning a list with a single record and total count
+        return issue_data_dict  # Returning a list with a single record and total count
