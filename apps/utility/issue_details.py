@@ -103,15 +103,15 @@ def issue_details_data(request,id):
             # call function to get menu id and partner
             menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
             #print("menu_card1111->",issue_key,menu_card)
+
         if menu_card is None:
             menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
             #print("menu_card2222->",issue_key,menu_card)
+
         if menu_card is None:
             menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
             #print("menu_card333->",issue_key,menu_card)
-        if menu_card is None:
-            menu_card = None
-            partner = False
+
 
         changelog_assignee_created = utils.convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None

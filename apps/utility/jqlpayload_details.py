@@ -6,7 +6,7 @@ def construct_payload(request,id=None):
     issueKey = id  # Filter by Issue Key
     payload = {
         "expand": ["changelog"],
-        "jql": f"issuetype in ('issueType', 'Sub-task, Tasks') AND key in ({issueKey}) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') AND 'Service Category[Dropdown]' = 'Expert Services' AND assignee NOT in (EMPTY)",
+        "jql": f"key in ({issueKey}) AND status in ('Awaiting Customer', 'In Process','In Review','Not Started') AND 'Service Category[Dropdown]' = 'Expert Services' AND assignee NOT in (EMPTY)",
         "fieldsByKeys": False,
         "fields": [
             "summary",

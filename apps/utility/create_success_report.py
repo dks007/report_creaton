@@ -7,10 +7,10 @@ from django.contrib.auth.models import User
 from django.core.serializers import serialize
 
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster
+    SubCapabilityMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
 
 
-def success_report(data: dict):
+def success_report(data: dict, logo_id=None):
     menu_card = MenuCardMaster.objects.filter(menu_card=data.get('menu_card')).first()
     product = ProductMaster.objects.filter(product_name=data.get('product')).first()
     capability = CapabilityMaster.objects.filter(capability_name=data.get('capability')).first()
@@ -65,15 +65,28 @@ def convert_json(response):
     return response
 
 
-def all_list():
+def all_master_list():
     menu_card = MenuCardMaster.objects.all()
     product = ProductMaster.objects.all()
     capability = CapabilityMaster.objects.all()
+    creator = CreatorMaster.objects.all()
+    customer = CustomerMaster.objects.all()
 
-    json_data1 = json.loads(serialize('json', menu_card))
-    json_data2 = json.loads(serialize('json', product))
-    json_data3 = json.loads(serialize('json', capability))
+    json_menu_card = json.loads(serialize('json', menu_card))
+    json_product = json.loads(serialize('json', product))
+    json_capability = json.loads(serialize('json', capability))
+    json_creator = json.loads(serialize('json', creator))
+    json_customer = json.loads(serialize('json', customer))
 
-    return json_data1, json_data2, json_data3
+    return json_menu_card, json_product, json_capability, json_creator, json_customer
 
-
+# Saving logo data
+def upload_logo_image(logo_file):
+    # Create a new LogoMaster instance with the uploaded logo file
+    logo = LogoMaster.objects.create(
+        logo_file_name=logo_file.name,
+        logo_file_type=logo_file.content_type,
+        logo_file_size=logo_file.size,
+        logo=logo_file.read()  # Assuming BinaryField is used to store the image data
+    )
+    return logo.id
