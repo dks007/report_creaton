@@ -107,3 +107,5 @@ class SuccessReportSerializer1(serializers.Serializer):
     assignee_name = serializers.CharField(max_length=100)
     creator_name = serializers.CharField(max_length=100)
     action = serializers.CharField(max_length=100, required=False)
+    # New field for logo file upload
+    logo = serializers.ImageField(required=False)
