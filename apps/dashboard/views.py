@@ -49,14 +49,14 @@ def get_create_report(request, id):
     """
     if request.method == 'GET':
         response = SuccessReport.objects.filter(jira_key=id).first()
-        menu_card, product, capability, creator, customer  = all_master_list()
+        menu_card, product, capability, creator, customer = all_master_list()
         if not response:
             response = create_report(request, id)
-            response['menu_card_list'] = menu_card
-            response['product_list'] = product
-            response['capability_list'] = capability
-            response['creator_list'] = creator
-            response['customer_list'] = customer
+            response['menu_card_list'] = json.loads(menu_card)
+            response['product_list'] = json.loads(product)
+            response['capability_list'] = json.loads(capability)
+            response['creator_list'] = json.loads(creator)
+            response['customer_list'] = json.loads(customer)
             
         else:
             response = {
@@ -70,9 +70,11 @@ def get_create_report(request, id):
                 "assignee_name": "Andreas Andersson",
                 "creator_name": response.creator.creator_name,
                 "report_status": response.report_status.report_status_name,
-                "menu_card_list": menu_card,
-                "product_list": product,
-                "capability_list": capability,
+                'menu_card_list': json.loads(menu_card),
+                'product_list': json.loads(product),
+                'capability_list': json.loads(capability),
+                'creator_list': json.loads(creator),
+                'customer_list': json.loads(customer),
             }
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:

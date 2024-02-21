@@ -17,11 +17,19 @@ def success_report(data: dict, logo_id=None):
     expert = ExpertMaster.objects.filter(expert_name=data.get('expert_name')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
     creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
+    user = User.objects.get(id=1)
+    if expert is None:
+        ExpertMaster.objects.create(
+            expert_account_id='1',
+            expert_email='expert@gmail.com',
+            expert_name=data.get('expert_name'),
+            created_by=user,
+            updated_by=user
+        )
     if data.get('action') == 'saved':
         report_status = ReportStatusMaster.objects.get(id=4)
     else:
         report_status = ReportStatusMaster.objects.get(id=1)
-    user = User.objects.get(id=1)
     if creator is None:
         creator = CreatorMaster.objects.create(
             creator_name=data.get('creator_name'),
@@ -66,17 +74,17 @@ def convert_json(response):
 
 
 def all_master_list():
-    menu_card = MenuCardMaster.objects.all()
-    product = ProductMaster.objects.all()
-    capability = CapabilityMaster.objects.all()
-    creator = CreatorMaster.objects.all()
-    customer = CustomerMaster.objects.all()
+    menu_card = MenuCardMaster.objects.all().values('id', 'menu_card')
+    product = ProductMaster.objects.all().values('id', 'product_name')
+    capability = CapabilityMaster.objects.all().values('id', 'capability_name')
+    creator = CreatorMaster.objects.all().values('id', 'creator_name')
+    customer = CustomerMaster.objects.all().values('id', 'customer_id', 'customer_name')
 
-    json_menu_card = json.loads(serialize('json', menu_card))
-    json_product = json.loads(serialize('json', product))
-    json_capability = json.loads(serialize('json', capability))
-    json_creator = json.loads(serialize('json', creator))
-    json_customer = json.loads(serialize('json', customer))
+    json_menu_card = json.dumps(list(menu_card))
+    json_product = json.dumps(list(product))
+    json_capability = json.dumps(list(capability))
+    json_creator = json.dumps(list(creator))
+    json_customer = json.dumps(list(customer))
 
     return json_menu_card, json_product, json_capability, json_creator, json_customer
 
