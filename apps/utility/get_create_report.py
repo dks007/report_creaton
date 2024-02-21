@@ -30,18 +30,19 @@ def jiradata_create_report(request, id):
     issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
 
-    # url = os.getenv('JIRA_URL')
-    # Send request to Jira API
-    # response = requests.request(
-    #     "POST",
-    #     url,
-    #     headers=headers,
-    #     auth=auth,
-    #     data=json.dumps(payload),
-    #     verify=False
-    # )
+    url = os.getenv('JIRA_URL')
+    #Send request to Jira API
+    response = requests.request(
+         "POST",
+         url,
+         headers=headers,
+         auth=auth,
+         data=json.dumps(payload),
+         verify=False
+     )
 
-    json_file_path = "/home/rafique/Desktop/reporting/apps/utility/singledata.json"
+    #json_file_path = "/home/rafique/Desktop/reporting/apps/utility/singledata.json"
+    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
     # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file)
@@ -50,7 +51,6 @@ def jiradata_create_report(request, id):
     if True:
         # issues_data = json.loads(response.text)
         issues_data = data
-        #total_records = issues_data['total']
         # call menu card from MenucardMaster database
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         issue = issues_data['issues'][0]  # Extracting the single issue
@@ -66,7 +66,6 @@ def jiradata_create_report(request, id):
 
         # get subtask list
         subtasks = issue["fields"].get('subtasks', [])
-        #subtasks_list = utils.extract_subtasks_data(subtasks)
         description = issue["fields"].get('description', "")
 
         if description:
@@ -82,11 +81,7 @@ def jiradata_create_report(request, id):
                         changelog_assignee_created = created_date
 
         issue_summary = issue["fields"].get('summary', "")
-        #issue_id = issue.get("id", "")
         issue_key = issue.get("key", "")
-        #created = issue["fields"].get('created', "")
-        #created = utils.convert_date(created)
-        #parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
         parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
         parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
                 "fields"] else None 
@@ -100,17 +95,13 @@ def jiradata_create_report(request, id):
             activit_menu_string = activity_split_string[2]
             # call function to get menu id and partner
             menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
-            #print("menu_card1111->",issue_key,menu_card)
 
         if menu_card is None:
             menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
-            #print("menu_card2222->",issue_key,menu_card)
 
         if menu_card is None:
             menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
-            #print("menu_card333->",issue_key,menu_card)
-
-
+            
         changelog_assignee_created = utils.convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
         creator_name = issue["fields"]["creator"].get("displayName", "") if "creator" in issue[
@@ -118,15 +109,13 @@ def jiradata_create_report(request, id):
         menu_card = menu_card
         partner = partner
         activit_project_id = activit_project_id
-        #project_id = issue["fields"]["project"].get("id", "")
         project_name = issue["fields"]["project"].get("name", "")
         #project_key = issue["fields"]["project"].get("key", "")
         # get customer id from project key
         #customer_id = project_key[2:]
-        #customer_email = issue["fields"].get("customfield_16262", "")
+        customer_email = issue["fields"].get("customfield_16262", "")
         #customer_contact_no = issue["fields"].get("customfield_16263", "")
-        customer_location = issue["fields"]["customfield_16264"].get("value", "") if issue["fields"][
-            "customfield_16264"] else None
+        customer_contact = issue["fields"].get("customfield_16032", "")
         snow_case_no = issue["fields"].get("customfield_16266", "")
         subtask = issue["fields"]["issuetype"].get("subtask", "")
 
@@ -148,9 +137,10 @@ def jiradata_create_report(request, id):
             "project_name": project_name,  # customer name/proect name
             "snow_case_no": snow_case_no,
             "assignee_email":assignee_email,
-            "creator_email": creator_email,
-            "assignee_name": assignee_name,  # expert name
-            "creator_name": creator_name  # creator name
+            "customer_email": customer_email,
+            "expert_name": assignee_name,  # expert name
+            "creator_name": creator_name,  # customer contact
+            "customer_contact": customer_contact  # customer contact
         }
 
         # Additional processing and enriching the issue_data_dict
@@ -158,7 +148,7 @@ def jiradata_create_report(request, id):
 
         if report_data:
             issue_data_dict['report_status'] = str(report_data.report_status.id)
-            # issue_data_dict['report_error'] = report_data.error_msg
+            issue_data_dict['report_error'] = report_data.error_msg
         else:
             issue_data_dict['report_status'] = '1'
 

@@ -24,7 +24,13 @@ class CustomerMaster(BaseModel):
 
     def __str__(self):
         return self.customer_name
+class CustomerContactMaster(BaseModel):
+    customer_contact = models.CharField(max_length=100, unique=True)
+    customer_email = models.CharField(max_length=255,null=True)
 
+    def __str__(self):
+        return f"ExpertMaster {self.id} - {self.expert_name}"
+    
 class RegionMaster(BaseModel):
     region_name = models.CharField(max_length=50, unique=True)
 
@@ -127,7 +133,7 @@ class ExpertMaster(BaseModel):
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
-
+    
 class CreatorMaster(BaseModel):
     creator_account_id = models.CharField(max_length=100)
     creator_name = models.CharField(max_length=100, unique=True)

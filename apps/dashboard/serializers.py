@@ -3,8 +3,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from apps.dashboard.models import SuccessReport
-from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
-                                           CreatorMaster, ExpertMaster, LogoMaster)
+from apps.dashboard.models.masters import (MenuCardMaster, CustomerMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
+                                           CreatorMaster, ExpertMaster, LogoMaster, CustomerContactMaster)
 
 
 class MenuListSerializer(serializers.ModelSerializer):
@@ -22,8 +22,26 @@ class ProjectSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ProjectMaster
-        fields = '__all__'
+        #fields = '__all__'
+        fields = ['id', 'product_name']
 
+class CustomerContactSerializer(serializers.ModelSerializer):
+    """
+    customer contact serializer, used to serialize all project objects
+    """
+    class Meta:
+        model = CustomerContactMaster
+        #fields = '__all__'
+        fields = ['id', 'customer_contact']
+
+class CustomerSerializer(serializers.ModelSerializer):
+    """
+    customer  serializer, used to serialize all project objects
+    """
+    class Meta:
+        model = CustomerMaster
+        #fields = '__all__'
+        fields = ['id', 'customer_name']
 
 class CapabilitySerializer(serializers.ModelSerializer):
     """
@@ -31,8 +49,8 @@ class CapabilitySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = CapabilityMaster
-        fields = '__all__'
-
+        #fields = '__all__'
+        fields = ['id', 'capability_name']
 
 class SubCapabilitySerializer(serializers.ModelSerializer):
     """
@@ -40,7 +58,7 @@ class SubCapabilitySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = SubCapabilityMaster
-        fields = '__all__'
+        fields = ['id', 'sub_capability_name']
 
 
 class ExpertSerializer(serializers.ModelSerializer):
@@ -49,8 +67,17 @@ class ExpertSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ExpertMaster
-        fields = ('expert_name',)
+        fields = ['id', 'expert_name']
+        #fields = ('expert_name',)
 
+class MenuCardSerializer(serializers.ModelSerializer):
+    """
+    expert serializer, used to serialize expert objects
+    """
+    class Meta:
+        model = MenuCardMaster
+        fields = ['id', 'menu_card']
+        #fields = ('expert_name',)
 
 class CreatorSerializer(serializers.ModelSerializer):
     """
@@ -105,7 +132,6 @@ class SuccessReportSerializer1(serializers.Serializer):
     project_name = serializers.CharField(max_length=100)
     snow_case_no = serializers.CharField(max_length=100)
     creator_email = serializers.CharField(max_length=100)
-    assignee_name = serializers.CharField(max_length=100)
     creator_name = serializers.CharField(max_length=100)
     action = serializers.CharField(max_length=20, required=False)
     # New field for logo file upload
