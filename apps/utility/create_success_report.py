@@ -17,7 +17,8 @@ def success_report(data: dict, logo_id=None):
     capability = CapabilityMaster.objects.filter(capability_name=data.get('capability')).first()
     expert = ExpertMaster.objects.filter(expert_name=data.get('expert_name')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
-    creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
+    customer_contact = CustomerContactMaster.objects.filter(customer_contact=data.get('customer_contact')).first()
+    #creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
     user = User.objects.get(id=1)
     if expert is None:
         ExpertMaster.objects.create(
@@ -31,10 +32,10 @@ def success_report(data: dict, logo_id=None):
         report_status = ReportStatusMaster.objects.get(id=4)
     else:
         report_status = ReportStatusMaster.objects.get(id=1)
-    if creator is None:
-        creator = CreatorMaster.objects.create(
-            creator_name=data.get('creator_name'),
-            creator_email=data.get('creator_email'),
+    if customer_contact is None:
+        customer_contact = CustomerContactMaster.objects.create(
+            customer_contact=data.get('customer_contact'),
+            customer_email=data.get('customer_email'),
             created_by=user,
             updated_by=user
         )
@@ -60,11 +61,11 @@ def success_report(data: dict, logo_id=None):
             'menu_card': menu_card,
             'product': product,
             'capability': capability,
-            'creator': creator,
             'snow_case_no': data.get('snow_case_no'),
             'report_status': report_status,
             "expert": expert,
             "customer": customer,
+            "customer_contact": customer_contact,
             "logo_id": logo_id
         }
 
@@ -80,9 +81,8 @@ def convert_json(response):
         "capability": response.capability.capability_name,
         "product": response.product.product_name,
         "snow_case_no": response.snow_case_no,
-        "creator_email": response.creator.creator_email,
-        "assignee_name": "Andreas Andersson",
-        "creator_name": response.creator.creator_name,
+        "expert": response.expert.expert_name,
+        "customer_contact": response.customer_contact.customer_contact,
         "report_status": response.report_status.report_status_name
     }
 
@@ -102,13 +102,13 @@ def all_master_list():
     json_customer_contact = json.loads(serialize('json', customer_contact))
     json_customer = json.loads(serialize('json', customer)) """
 
-    json_menu_card          = list(menu_card),
-    json_product            = list(product),
-    json_customer_contact   = list(customer_contact),
-    json_customer           = list(customer),
-    json_cap_subcap         = list(cap_subcap)
+    list_menu_card          = list(menu_card),
+    list_product            = list(product),
+    list_customer_contact   = list(customer_contact),
+    list_customer           = list(customer),
+    list_cap_subcap         = list(cap_subcap)
 
-    return json_menu_card, json_product, json_cap_subcap, json_customer_contact, json_customer
+    return list_menu_card, list_product, list_cap_subcap, list_customer_contact, list_customer
 
 # Saving logo data
 # Saving logo data

@@ -122,7 +122,7 @@ class SuccessReportSerializer1(serializers.Serializer):
     """
     success-report serializer, used to serializer success-report objects,
     """
-    issue_key = serializers.CharField(max_length=20, required=False)
+    issue_key = serializers.CharField(max_length=20, required=True)
     parent_key = serializers.CharField(max_length=20)
     menu_card = serializers.CharField(max_length=20)
     capability = serializers.CharField(max_length=100)
@@ -131,11 +131,12 @@ class SuccessReportSerializer1(serializers.Serializer):
     customer_name = serializers.CharField(max_length=100)
     project_name = serializers.CharField(max_length=100)
     snow_case_no = serializers.CharField(max_length=100)
-    creator_email = serializers.CharField(max_length=100)
-    creator_name = serializers.CharField(max_length=100)
-    action = serializers.CharField(max_length=20, required=False)
+    #creator_email = serializers.CharField(max_length=100)
+    #creator_name = serializers.CharField(max_length=100)
+    customer_contact = serializers.CharField(max_length=100)
+    action = serializers.CharField(max_length=20, required=True)
     # New field for logo file upload
-    logo = serializers.ImageField(required=False)
+    logo = serializers.ImageField(required=True)
 
     def validate_logo(self, value):
         # Validate image file format

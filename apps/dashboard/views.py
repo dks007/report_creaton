@@ -49,24 +49,15 @@ def get_create_report(request, id):
     """
     if request.method == 'GET':
         response = SuccessReport.objects.filter(jira_key=id).first()
-<<<<<<< HEAD
-        menu_card, product, capability, customer_contact, customer  = all_master_list()
-=======
-        menu_card, product, capability, creator, customer = all_master_list()
->>>>>>> 155d4d2627a3aaacf67085779fecacbb0fe42d75
+        menu_card, product, capsubcap, customer_contact, customer  = all_master_list()
         if not response:
             response = jiradata_create_report(request, id)
             response['menu_card_list'] = menu_card
             response['product_list'] = product
-            response['capability_list'] = capability
-<<<<<<< HEAD
+            response['capsubcap_list'] = capsubcap
             response['customer_contact_list'] = customer_contact
             response['customer_list'] = customer
             
-=======
-            response['creator_list'] = creator
-            response['customer_list'] = customer            
->>>>>>> 155d4d2627a3aaacf67085779fecacbb0fe42d75
         else:
             response = {
                 "issue_key": response.jira_key,
@@ -75,15 +66,13 @@ def get_create_report(request, id):
                 "product": response.product.product_name,
                 "project_name": response.product.product_name,
                 "snow_case_no": response.snow_case_no,
-                "creator_email": response.creator.creator_email,
-                "assignee_name": "Andreas Andersson",
-                "creator_name": response.creator.creator_name,
+                "expert_name": response.expert.expert_name,
+                "customer_contact": response.customer_contact.customer_contact,
                 "report_status": response.report_status.report_status_name,
                 'menu_card_list': json.loads(menu_card),
                 'product_list': json.loads(product),
-                'capability_list': json.loads(capability),
-                'creator_list': json.loads(creator),
-                'customer_list': json.loads(customer),
+                'capability_list': json.loads(response.capability.capability_name),
+                'customer_list': json.loads(customer)
             }
         return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
     else:

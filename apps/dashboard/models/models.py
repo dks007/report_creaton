@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone  # Import the timezone module
 
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster
+    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster, CustomerContactMaster
 
 
 class SuccessReport(models.Model):
@@ -16,6 +16,7 @@ class SuccessReport(models.Model):
     jira_key = models.CharField(max_length=100, null=False)
     menu_card = models.ForeignKey(MenuCardMaster, on_delete=models.CASCADE)
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE, null=True, blank=True)
+    customer_contact = models.ForeignKey(CustomerContactMaster, on_delete=models.CASCADE, null=True, blank=True)
     expert = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(ProductMaster, on_delete=models.CASCADE)
     capability = models.ForeignKey(CapabilityMaster, on_delete=models.CASCADE)
