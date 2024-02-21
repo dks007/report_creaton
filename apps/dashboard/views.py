@@ -13,7 +13,7 @@ from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, Ca
     SubCapabilitySerializer, SuccessReportSerializer, SuccessReportSerializer1
 from ..accounts.permissions import IFSPermission
 from ..utility.create_success_report import success_report, convert_json, all_master_list, upload_logo_image
-from ..utility.get_create_report import create_report
+from ..utility.get_create_report import jiradata_create_report
 from ..utility.issue_listing import issue_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
@@ -42,7 +42,7 @@ def get_issue_details(request,id):
     else:
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
-
+# getting first if data already saved in database 2nd get from jira
 def get_create_report(request, id):
     """
     used to fetch specific issue
@@ -51,13 +51,12 @@ def get_create_report(request, id):
         response = SuccessReport.objects.filter(jira_key=id).first()
         menu_card, product, capability, creator, customer = all_master_list()
         if not response:
-            response = create_report(request, id)
-            response['menu_card_list'] = json.loads(menu_card)
-            response['product_list'] = json.loads(product)
-            response['capability_list'] = json.loads(capability)
-            response['creator_list'] = json.loads(creator)
-            response['customer_list'] = json.loads(customer)
-            
+            response = jiradata_create_report(request, id)
+            response['menu_card_list'] = menu_card
+            response['product_list'] = product
+            response['capability_list'] = capability
+            response['creator_list'] = creator
+            response['customer_list'] = customer            
         else:
             response = {
                 "issue_key": response.jira_key,
@@ -210,9 +209,14 @@ class SuccessReportViewSet1(viewsets.GenericViewSet):
             # Upload logo image if provided
             logo_id = None
             if 'logo' in request.FILES:
-                logo_id = upload_logo_image(request.FILES['logo'])
-            # Save success report with logo id
-            processed_data = success_report(serializer.validated_data, logo_id)
-            return Response({'data': convert_json(processed_data [0]), 'status': status.HTTP_201_CREATED})
-        return Response({'msg': 'something went wrong', 'status': status.HTTP_404_NOT_FOUND})
+                logo_id,error_msg = upload_logo_image(request.FILES['logo'])
+                if logo_id:
+                    # Save success report with logo id
+                    processed_data = success_report(serializer.validated_data, logo_id)
+                    return Response({'data': convert_json(processed_data [0]), 'status': status.HTTP_201_CREATED})
+                else:
+                    return Response({'msg':error_msg, 'status': status.HTTP_404_NOT_FOUND})
+            else:
+                return Response({'msg':"Logo is required !", 'status': status.HTTP_404_NOT_FOUND})
+        return Response({'msg': serializer.errors, 'status': status.HTTP_404_NOT_FOUND})
 
