@@ -123,7 +123,7 @@ class MenuSdoMapping(BaseModel):
 class ExpertMaster(BaseModel):
     expert_account_id = models.CharField(max_length=100)
     expert_name = models.CharField(max_length=100, unique=True)
-    expert_email = models.CharField(max_length=255)
+    expert_email = models.CharField(max_length=255,null=True)
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
@@ -131,7 +131,7 @@ class ExpertMaster(BaseModel):
 class CreatorMaster(BaseModel):
     creator_account_id = models.CharField(max_length=100)
     creator_name = models.CharField(max_length=100, unique=True)
-    creator_email = models.CharField(max_length=255)
+    creator_email = models.CharField(max_length=255,null=True)
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"

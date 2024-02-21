@@ -5,7 +5,8 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.serializers import serialize
-
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
     SubCapabilityMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
 
@@ -26,6 +27,20 @@ def success_report(data: dict, logo_id=None):
         creator = CreatorMaster.objects.create(
             creator_name=data.get('creator_name'),
             creator_email=data.get('creator_email'),
+            created_by=user,
+            updated_by=user
+        )
+    if expert is None:
+        expert = ExpertMaster.objects.create(
+            expert_name=data.get('expert_name'),
+            expert_email=data.get('expert_email'),
+            created_by=user,
+            updated_by=user
+        )
+    if customer is None:
+        customer = CustomerMaster.objects.create(
+            customer_name=data.get('customer_name'),
+            customer_email=data.get('customer_email'),
             created_by=user,
             updated_by=user
         )
@@ -65,7 +80,7 @@ def convert_json(response):
 
     return response
 
-
+# Getting all require master data list
 def all_master_list():
     menu_card = MenuCardMaster.objects.all()
     product = ProductMaster.objects.all()
@@ -82,12 +97,26 @@ def all_master_list():
     return json_menu_card, json_product, json_capability, json_creator, json_customer
 
 # Saving logo data
+# Saving logo data
 def upload_logo_image(logo_file):
-    # Create a new LogoMaster instance with the uploaded logo file
-    logo = LogoMaster.objects.create(
-        logo_file_name=logo_file.name,
-        logo_file_type=logo_file.content_type,
-        logo_file_size=logo_file.size,
-        logo=logo_file.read()  # Assuming BinaryField is used to store the image data
-    )
-    return logo.id
+    try:
+        # Create a new LogoMaster instance with the uploaded logo file
+        logo = LogoMaster.objects.create(
+            logo_file_name=logo_file.name,
+            logo_file_type=logo_file.content_type,
+            logo_file_size=logo_file.size,
+            logo=logo_file.read()  # Assuming BinaryField is used to store the image data
+        )
+        return logo.id, None
+    except ValidationError as e:
+        # Handle validation errors
+        error_message = "Validation Error: {}".format(e)
+        return None, error_message
+    except IntegrityError as e:
+        # Handle duplicate entry error
+        error_message = "Duplicate entry error: {}".format(e)
+        return None, error_message
+    except Exception as e:
+        # Handle other unexpected errors
+        error_message = "An unexpected error occurred: {}".format(e)
+        return None, error_message

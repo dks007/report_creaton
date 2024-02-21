@@ -1,5 +1,6 @@
 # dashboard/serializers.py
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
@@ -94,9 +95,9 @@ class SuccessReportSerializer1(serializers.Serializer):
     """
     success-report serializer, used to serializer success-report objects,
     """
-    issue_key = serializers.CharField(max_length=100, required=False)
-    parent_key = serializers.CharField(max_length=100)
-    menu_card = serializers.CharField(max_length=100)
+    issue_key = serializers.CharField(max_length=20, required=False)
+    parent_key = serializers.CharField(max_length=20)
+    menu_card = serializers.CharField(max_length=20)
     capability = serializers.CharField(max_length=100)
     product = serializers.CharField(max_length=100)
     expert_name = serializers.CharField(max_length=100)
@@ -106,6 +107,14 @@ class SuccessReportSerializer1(serializers.Serializer):
     creator_email = serializers.CharField(max_length=100)
     assignee_name = serializers.CharField(max_length=100)
     creator_name = serializers.CharField(max_length=100)
-    action = serializers.CharField(max_length=100, required=False)
+    action = serializers.CharField(max_length=20, required=False)
     # New field for logo file upload
     logo = serializers.ImageField(required=False)
+
+    def validate_logo(self, value):
+        # Validate image file format
+        if value:
+            format = value.content_type.split('/')[1]
+            if format not in ['jpeg', 'jpg', 'png']:
+                raise ValidationError("Only JPEG and PNG formats are allowed for the logo.")
+        return value
