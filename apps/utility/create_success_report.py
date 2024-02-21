@@ -18,11 +18,19 @@ def success_report(data: dict, logo_id=None):
     expert = ExpertMaster.objects.filter(expert_name=data.get('expert_name')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
     creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
+    user = User.objects.get(id=1)
+    if expert is None:
+        ExpertMaster.objects.create(
+            expert_account_id='1',
+            expert_email='expert@gmail.com',
+            expert_name=data.get('expert_name'),
+            created_by=user,
+            updated_by=user
+        )
     if data.get('action') == 'saved':
         report_status = ReportStatusMaster.objects.get(id=4)
     else:
         report_status = ReportStatusMaster.objects.get(id=1)
-    user = User.objects.get(id=1)
     if creator is None:
         creator = CreatorMaster.objects.create(
             creator_name=data.get('creator_name'),
