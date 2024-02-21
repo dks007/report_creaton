@@ -49,7 +49,8 @@ def success_report(data: dict, logo_id=None):
             'snow_case_no': data.get('snow_case_no'),
             'report_status': report_status,
             "expert": expert,
-            "customer": customer
+            "customer": customer,
+            "logo_id": logo_id
         }
 
     )
