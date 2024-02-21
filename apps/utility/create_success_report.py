@@ -8,7 +8,7 @@ from django.core.serializers import serialize
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
+    SubCapabilityMaster, CustomerContactMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
 
 
 def success_report(data: dict, logo_id=None):
@@ -82,19 +82,25 @@ def convert_json(response):
 
 # Getting all require master data list
 def all_master_list():
-    menu_card = MenuCardMaster.objects.all()
-    product = ProductMaster.objects.all()
-    capability = CapabilityMaster.objects.all()
-    creator = CreatorMaster.objects.all()
-    customer = CustomerMaster.objects.all()
-
-    json_menu_card = json.loads(serialize('json', menu_card))
+    menu_card = MenuCardMaster.objects.values('id','menu_card')
+    product = ProductMaster.objects.values('id','product_name')
+    customer_contact = CustomerContactMaster.objects.values('id','customer_contact')
+    customer = CustomerMaster.objects.values('id','customer_name')
+    cap_subcap = cap_subcap_array()
+    
+    """ json_menu_card = json.loads(serialize('json', menu_card))
     json_product = json.loads(serialize('json', product))
     json_capability = json.loads(serialize('json', capability))
-    json_creator = json.loads(serialize('json', creator))
-    json_customer = json.loads(serialize('json', customer))
+    json_customer_contact = json.loads(serialize('json', customer_contact))
+    json_customer = json.loads(serialize('json', customer)) """
 
-    return json_menu_card, json_product, json_capability, json_creator, json_customer
+    json_menu_card          = list(menu_card),
+    json_product            = list(product),
+    json_customer_contact   = list(customer_contact),
+    json_customer           = list(customer),
+    json_cap_subcap         = list(cap_subcap)
+
+    return json_menu_card, json_product, json_cap_subcap, json_customer_contact, json_customer
 
 # Saving logo data
 # Saving logo data
@@ -120,3 +126,26 @@ def upload_logo_image(logo_file):
         # Handle other unexpected errors
         error_message = "An unexpected error occurred: {}".format(e)
         return None, error_message
+    
+def cap_subcap_array():
+    cap_subcap = []
+    capabilities = CapabilityMaster.objects.all()
+
+    for capability in capabilities:
+        cap_obj = {
+            'id': capability.id,
+            'name': capability.capability_name,
+            'sub_capabilities': []
+        }
+
+        sub_capabilities = SubCapabilityMaster.objects.filter(capability=capability)
+        for sub_capability in sub_capabilities:
+            sub_cap_obj = {
+                'id': sub_capability.id,
+                'name': sub_capability.sub_capability_name
+            }
+            cap_obj['sub_capabilities'].append(sub_cap_obj)
+
+        cap_subcap.append(cap_obj)
+
+    return cap_subcap

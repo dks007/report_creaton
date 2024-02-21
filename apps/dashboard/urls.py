@@ -17,7 +17,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('issue-listing/', get_issue_list),
     path('issue-details/<str:id>', get_issue_details),
-    path('create-report/<str:id>', get_create_report),
+    path('get-createreport/<str:id>', get_create_report),
     # path('create-report/', get_issue_details),
     # path('menu-card-listing/', MenuViewSet.as_view({'get': 'list'}))
     # Add any additional URL patterns as needed

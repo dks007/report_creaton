@@ -49,13 +49,13 @@ def get_create_report(request, id):
     """
     if request.method == 'GET':
         response = SuccessReport.objects.filter(jira_key=id).first()
-        menu_card, product, capability, creator, customer  = all_master_list()
+        menu_card, product, capability, customer_contact, customer  = all_master_list()
         if not response:
             response = jiradata_create_report(request, id)
             response['menu_card_list'] = menu_card
             response['product_list'] = product
             response['capability_list'] = capability
-            response['creator_list'] = creator
+            response['customer_contact_list'] = customer_contact
             response['customer_list'] = customer
             
         else:
