@@ -194,10 +194,17 @@ def issue_list_data(request):
         json_data = json.dumps(data_list, indent=2)
         response = json.loads(json_data)
         for dt in response:
-            desc = MenuCardMaster.objects.filter(menu_card=dt.get('menu_card')).first()
-            report_data = SuccessReport.objects.filter(jira_key=dt.get('issue_key')).first()
-            customer_map = CustomerMapping.objects.filter(customer__customer_id=dt.get('customer_id')).first()
-            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=dt.get('menu_card')).first()
+            menu_card_id = dt.get('menu_card')
+            customer_id = dt.get('customer_id')
+            #issue_key = dt.get('issue_key')
+            # Query for Menu Card Description
+            desc = MenuCardMaster.objects.filter(menu_card=menu_card_id, status=1).first()
+            # Query for Success Report Data
+            report_data = SuccessReport.objects.filter(jira_key=issue_key, status=1).first()
+            # Query for Customer Mapping
+            customer_map = CustomerMapping.objects.filter(customer__customer_id=customer_id, status=1).first()
+            # Query for Menu SDO Mapping
+            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=menu_card_id, status=1, sdo__status=1).first()
 
             if sdo_map:
                 dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
@@ -205,7 +212,7 @@ def issue_list_data(request):
                 dt['report_status'] = str(report_data.report_status.id)
                 dt['report_error'] = report_data.error_msg
             else:
-                dt['report_status'] = '0'
+                dt['report_status'] = '1'
             if desc is not None:
                 dt['menu_description'] = desc.menu_description
             if customer_map:

@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone  # Import the timezone module
 
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster, CustomerContactMaster
+    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster, CustomerContactMaster, SdoMaster, CSMMaster, SDMMaster, ExCustomerContactsMaster, BaseModel
 
 
 class SuccessReport(models.Model):
@@ -26,6 +26,9 @@ class SuccessReport(models.Model):
     error_msg = models.CharField(max_length=255, null=True, blank=True)
     download_link = models.TextField(null=True, blank=True)
     creator = models.ForeignKey(CreatorMaster, on_delete=models.SET_NULL, null=True, blank=True)
+    sdm = models.ForeignKey(SDMMaster, on_delete=models.CASCADE, null=True, blank=True)
+    csm = models.ForeignKey(CSMMaster, on_delete=models.CASCADE, null=True, blank=True)
+    sdo = models.ForeignKey(SdoMaster, on_delete=models.CASCADE, null=True, blank=True)
     approved_by_sdo = models.CharField(max_length=10, null=True, blank=True)
     approved_sdo_date = models.DateField(null=True, blank=True)
     approved_by_csm = models.CharField(max_length=10, null=True, blank=True)
@@ -41,3 +44,12 @@ class SuccessReport(models.Model):
 
     def __str__(self):
         return f"SuccessReport {self.id} - Jira Key: {self.jira_key}, Customer: {self.customer}, Expert: {self.expert}"
+
+
+# success report external customer mapping
+class SuccessReportExCustMapping(BaseModel):
+    report = models.ForeignKey(SuccessReport, on_delete=models.PROTECT)
+    ex_customer = models.ForeignKey(ExCustomerContactsMaster, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"SuccessReportExCustMapping {self.id} - MenuCard: {self.menu_card.menu_card}, Sdo: {self.sdo.sdo_name}"

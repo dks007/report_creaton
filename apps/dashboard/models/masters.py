@@ -200,3 +200,14 @@ class SubCapabilityMaster(BaseModel):
 
     def __str__(self):
         return f"SubCapabilityMaster {self.id} - {self.sub_capability_name}"
+
+#external customer contact
+class ExCustomerContactsMaster(BaseModel):
+    customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE,null=True, blank=True )
+    ex_customer_name = models.CharField(max_length=100)
+    ex_customer_email = models.TextField(null=True, blank=True)
+    ex_customer_id = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
+    def __str__(self):
+        return f"ExCustomerContactsMas {self.id} - {self.sub_capability_name}"
+
