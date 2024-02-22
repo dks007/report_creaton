@@ -145,7 +145,7 @@ def jiradata_create_report(request, id):
 
         # Additional processing and enriching the issue_data_dict
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-        print("report data->",report_data)
+   
         # check if records exists in success report
         if report_data:
 
