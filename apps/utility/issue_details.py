@@ -189,13 +189,16 @@ def issue_details_data(request,id):
 
         if sdo_map:
             issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
+
         if report_data:
             issue_data_dict['report_status'] = str(report_data.report_status.id)
             issue_data_dict['report_error'] = report_data.error_msg
         else:
-            issue_data_dict['report_status'] = '0'
+            issue_data_dict['report_status'] = '1'
+
         if desc is not None:
             issue_data_dict['menu_description'] = desc.menu_description
+
         if customer_map:
             issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
             issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''

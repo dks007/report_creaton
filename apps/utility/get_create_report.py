@@ -110,9 +110,9 @@ def jiradata_create_report(request, id):
         partner = partner
         activit_project_id = activit_project_id
         project_name = issue["fields"]["project"].get("name", "")
-        #project_key = issue["fields"]["project"].get("key", "")
+        project_key = issue["fields"]["project"].get("key", "")
         # get customer id from project key
-        #customer_id = project_key[2:]
+        customer_id = project_key[2:]
         customer_email = issue["fields"].get("customfield_16262", "")
         #customer_contact_no = issue["fields"].get("customfield_16263", "")
         customer_contact = issue["fields"].get("customfield_16032", "")
@@ -145,11 +145,35 @@ def jiradata_create_report(request, id):
 
         # Additional processing and enriching the issue_data_dict
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-
+        print("report data->",report_data)
+        # check if records exists in success report
         if report_data:
+
             issue_data_dict['report_status'] = str(report_data.report_status.id)
             issue_data_dict['report_error'] = report_data.error_msg
+            issue_data_dict['sdo_name'] = str(report_data.sdo)
+            issue_data_dict['csm_name'] = str(report_data.csm)
+            issue_data_dict['sdm_name'] = str(report_data.sdm)
+
         else:
+
+            # get sdm, sdo and csm for storage in success report
+            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
+            customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
+
+            if sdo_map:
+                issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
+            else:
+                issue_data_dict['sdo_name']=''
+
+            if customer_map:
+                issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
+                issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+            else:
+                issue_data_dict['csm_name']=''
+                issue_data_dict['sdm_name']=''
+
             issue_data_dict['report_status'] = '1'
+            issue_data_dict['report_error'] = ''
 
         return issue_data_dict  # Returning a list with a single record and total count
