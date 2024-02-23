@@ -3,10 +3,6 @@ import json
 from requests.auth import HTTPBasicAuth
 import os
 import django
-from apps.dashboard.models import SuccessReport
-from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
-from datetime import datetime
-from apps.utility import utils
 from .jqlconfig import headers, auth
 from .jql_query import custome_query_payload
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
@@ -40,14 +36,9 @@ def issue_bykey(filterKey):
 
     if response.status_code == 200:
         issue_data = json.loads(response.text)
-        #total_records = issue_data['total']
         issue = issue_data['issues'][0]  # Extracting the single issue            
-        #issue_key = issue.get("key", "")
-        #parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
-        #parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
         activity_short_name = issue["fields"].get("customfield_16036", None)
         # Create an Issue instance
-        
         return  activity_short_name # Returning a list with a single record and total count
 
     else:
