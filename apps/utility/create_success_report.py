@@ -8,7 +8,8 @@ from django.core.serializers import serialize
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, CustomerContactMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
+    SubCapabilityMaster, CustomerContactMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, \
+    ProjectMaster, LogoMaster, SDMMaster, CSMMaster, SdoMaster
 from apps.utility.create_upload_file import create_folder_and_upload_to_sharepoint
 
 
@@ -19,7 +20,10 @@ def success_report(data: dict, logo_id=None):
     expert = ExpertMaster.objects.filter(expert_name=data.get('expert_name')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
     customer_contact = CustomerContactMaster.objects.filter(customer_contact=data.get('customer_contact')).first()
-    #creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
+    sdm = SDMMaster.objects.filter(sdm_name=data.get('sdm_name')).first()
+    csm = CSMMaster.objects.filter(csm_name=data.get('csm_name')).first()
+    sdo = SdoMaster.objects.filter(sdo_name=data.get('sdo_name')).first()
+    # creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
     if data.get('action') == 'saved':
         report_status = ReportStatusMaster.objects.get(id=4)
     else:
@@ -58,7 +62,10 @@ def success_report(data: dict, logo_id=None):
                 "expert": expert,
                 "customer": customer,
                 "customer_contact": customer_contact,
-                "logo_id": logo_id
+                "logo_id": logo_id,
+                'sdm': sdm,
+                'sdo': sdo,
+                'csm': csm
             }
 
         )
@@ -77,7 +84,10 @@ def success_report(data: dict, logo_id=None):
                     "expert": expert,
                     "customer": customer,
                     "customer_contact": customer_contact,
-                    "logo_id": logo_id
+                    "logo_id": logo_id,
+                    'sdm': sdm,
+                    'sdo': sdo,
+                    'csm': csm
                 }
 
             )
@@ -100,14 +110,15 @@ def convert_json(response):
 
     return response
 
+
 # Getting all require master data list
 def all_master_list():
-    menu_card = MenuCardMaster.objects.values('id','menu_card')
-    product = ProductMaster.objects.values('id','product_name')
-    customer_contact = CustomerContactMaster.objects.values('id','customer_contact')
-    customer = CustomerMaster.objects.values('id','customer_name')
+    menu_card = MenuCardMaster.objects.values('id', 'menu_card')
+    product = ProductMaster.objects.values('id', 'product_name')
+    customer_contact = CustomerContactMaster.objects.values('id', 'customer_contact')
+    customer = CustomerMaster.objects.values('id', 'customer_name')
     cap_subcap = cap_subcap_array()
-    
+
     """ json_menu_card = json.loads(serialize('json', menu_card))
     json_product = json.loads(serialize('json', product))
     json_capability = json.loads(serialize('json', capability))
@@ -121,6 +132,7 @@ def all_master_list():
     list_cap_subcap = list(cap_subcap)
 
     return list_menu_card, list_product, list_cap_subcap, list_customer_contact, list_customer
+
 
 # Saving logo data
 # Saving logo data
@@ -146,7 +158,8 @@ def upload_logo_image(logo_file):
         # Handle other unexpected errors
         error_message = "An unexpected error occurred: {}".format(e)
         return None, error_message
-    
+
+
 def cap_subcap_array():
     cap_subcap = []
     capabilities = CapabilityMaster.objects.all()
