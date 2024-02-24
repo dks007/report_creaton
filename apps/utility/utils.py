@@ -1,4 +1,7 @@
 from datetime import datetime
+from apps.dashboard.models import SuccessReport
+from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
+from django.core.exceptions import ObjectDoesNotExist
 import re
 # common functions used by various apps
 def convert_date(date_str):
@@ -78,24 +81,6 @@ def extract_subtasks_data(subtasks):
     else:
         return []
 
-
-# Function to find the menu id and partner from activity short menu
-""" def find_menuid_in_string(match_str,menuList):
-    if match_str:
-        matching_values = [menu_item for menu_item in menuList if menu_item in match_str]
-        longest_matching_value = ''
-        p_is_after_match = ''
-        longest_matching_value = max(matching_values, key=len, default=None)
-
-        if longest_matching_value is not None:
-            index_of_match = match_str.find(longest_matching_value)
-            p_is_after_match = (
-                                    index_of_match + len(longest_matching_value) < len(match_str)) and (
-                                    match_str[index_of_match + len(longest_matching_value)] == 'P')
-            return longest_matching_value, p_is_after_match
-        return None, False
-    else:
-        return None, False """
 # getting menu card and partner by given string
 def find_menuid_in_string(match_str, menuList):
     if match_str:
@@ -116,3 +101,68 @@ def find_menuid_in_string(match_str, menuList):
         else:
             return None, False
     return None, False
+
+# get report data to write document
+def getSuccessReportData(issueKey):
+    try:
+        issue_data_dict = {}
+        
+        # Attempt to retrieve report data
+        report_data = SuccessReport.objects.filter(jira_key=issueKey).first()
+        
+        # If report_data is None, no record with the provided issueKey was found
+        if report_data is None:
+            return None
+        
+        # Extract data from report_data and populate issue_data_dict
+        issue_data_dict['sdo_name'] = report_data.sdo.sdo_name.strip()
+        issue_data_dict['csm_name'] = report_data.csm.csm_name.strip()
+        issue_data_dict['sdm_name'] = report_data.sdm.sdm_name.strip()
+        issue_data_dict['snow_case_no'] = report_data.snow_case_no.strip()
+        issue_data_dict['menu_card'] = report_data.menu_card.menu_card.strip()
+        issue_data_dict['menu_description'] = report_data.menu_card.menu_description.strip()
+        issue_data_dict['expert_name'] = report_data.expert.expert_name.strip()
+        issue_data_dict['product_name'] = report_data.product.product_name.strip()
+        issue_data_dict['capability_name'] = report_data.capability.capability_name.strip()
+        issue_data_dict['sub_capability_name'] = report_data.sub_capability.sub_capability_name.strip()
+        issue_data_dict['customer_name'] = report_data.customer.customer_name.strip()
+        issue_data_dict['customer_contact'] = report_data.customer_contact.customer_contact.strip()
+
+        return issue_data_dict
+    
+    except ObjectDoesNotExist:
+        # Handle the case where any of the related objects do not exist
+        return None
+        
+
+# function to get sdm, csm, sdo , report status and error message 
+def getAdditionDataBKey(issue_data_dict):
+    # Additional processing and enriching the issue_data_dict
+        report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
+        # check if records exists in success report table
+        if report_data:
+            issue_data_dict['report_status'] = str(report_data.report_status.id)
+            issue_data_dict['report_error'] = report_data.error_msg
+            issue_data_dict['sdo_name'] = str(report_data.sdo.sdo_name)
+            issue_data_dict['csm_name'] = str(report_data.csm.csm_name)
+            issue_data_dict['sdm_name'] = str(report_data.sdm.sdm_name)
+        else:
+            # get sdm, sdo and csm to save in success report from jira
+            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
+            customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
+
+            if sdo_map:
+                issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
+            else:
+                issue_data_dict['sdo_name']=''
+
+            if customer_map:
+                issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
+                issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+            else:
+                issue_data_dict['csm_name']=''
+                issue_data_dict['sdm_name']=''
+
+            issue_data_dict['report_status'] = '1'
+            issue_data_dict['report_error'] = ''
+        return issue_data_dict

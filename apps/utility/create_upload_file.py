@@ -3,7 +3,25 @@
 import requests
 from requests.auth import HTTPBasicAuth  # Use the appropriate authentication method
 from django.conf import settings
+from docxtpl import DocxTemplate, InlineImage
+from utility.utils import getSuccessReportData
 
+# creating Report file from template
+def executeSchedulerJob(issueKey):
+
+    #getData = getSuccessReportData(issueKey)
+    print ("Inside the SchedulerJob Class executeSchedulerJob method")
+    doc = DocxTemplate ("C:\\Users\\lokain\\Documents\\workarea\\Success-Pilot-Web-Project\\IFS_Success_Final_Report_Template.docx")
+    #context = {'workplan_number' : '123' , 'person' : 'lokesh', 'location':'Bangalore'}
+    context = {
+        'Insert_MenuCard_Service_Heading_and_Number_Here' : 'Solution design best practices for IFS Software deployments - SAA2',
+        'Insert_Customer_branding_here' : InlineImage (doc, 'C:\\Users\\lokain\\Documents\\workarea\\Success-Pilot-Web-Project\\acmeCorporation.png'),
+        'customer_name' : 'ACME Corporation',
+        'List_the_names_of_the_participants_from_IFS' : 'Lokesh Kannaiah',
+        'List_the_names_of_the_participants_from_customer': 'Satpal, Dilip Kumar',
+        'ServiceNow_ID' : 'CS009876534'
+        }
+    doc.render(context)
 
 def create_folder_and_upload_to_sharepoint(success_report):
     base_url = settings.SHAREPOINT_BASE_URL

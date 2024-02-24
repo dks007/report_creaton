@@ -6,9 +6,10 @@ import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
 from datetime import datetime
-from apps.utility import utils
+from apps.utility.utils import getAdditionDataBKey, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
 from .jqlconfig import headers, auth
 from .jqlpayload_details import construct_payload
+from .issue_bykey import issue_bykey
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
@@ -49,7 +50,6 @@ def issue_details_data(request,id):
     if True:
         #issues_data = json.loads(response.text)
         issues_data = data
-        total_records = issues_data['total']
         #call menu card from MenucardMaster database
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         issue = issues_data['issues'][0]  # Extracting the single issue
@@ -64,15 +64,12 @@ def issue_details_data(request,id):
         frequency=''
         changelog = issue.get("changelog", {}).get("histories", [])
         changelog_assignee_created = None
-
-            #get subtask list
+        #get subtask list
         subtasks = issue["fields"].get('subtasks', [])
-        subtasks_list = utils.extract_subtasks_data(subtasks)
+        subtasks_list = extract_subtasks_data(subtasks)
         description = issue["fields"].get('description', "")
-
-            
         if description: 
-            capability, product, product_version, frequency=utils.get_productCapability(description)
+            capability, product, product_version, frequency=get_productCapability(description)
 
         # Extract assignee and created date from changelog
         for history in changelog:
@@ -86,13 +83,14 @@ def issue_details_data(request,id):
         issue_summary = issue["fields"].get('summary', "")
         issue_id = issue.get("id", "")
         issue_key = issue.get("key", "")
+        subtask = issue["fields"]["issuetype"].get("subtask", "")
         created = issue["fields"].get('created', "")
-        created = utils.convert_date(created)
+        created = convert_date(created)
         parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
         parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
         parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue[
             "fields"] else None
-
+        
         activity_short_name = issue["fields"].get("customfield_16036", "")
         if activity_short_name and '.' in activity_short_name:
             activity_split_string = activity_short_name.split('.')
@@ -101,19 +99,24 @@ def issue_details_data(request,id):
             # getting activit menuid string
             activit_menu_string = activity_split_string[2]
             # call function to get menu id and partner
-            menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
-            #print("menu_card1111->",issue_key,menu_card)
+            menu_card, partner = find_menuid_in_string(activit_menu_string,menuList)
 
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
-            #print("menu_card2222->",issue_key,menu_card)
-
+            menu_card, partner = find_menuid_in_string(issue_summary,menuList)
+            
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
-            #print("menu_card333->",issue_key,menu_card)
-
-
-        changelog_assignee_created = utils.convert_date(changelog_assignee_created)
+            menu_card, partner = find_menuid_in_string(parent_summary,menuList)
+        
+        if menu_card is None and subtasks is True:
+                #getting parent activity short name
+                parent_activity_string = issue_bykey(parent_key)
+                if parent_activity_string:
+                    parent_activity_name = parent_activity_string.split('.')
+                    # getting activity project id
+                    parent_activit_id = parent_activity_name[0]
+                    menu_card, partner = find_menuid_in_string(parent_activit_id,menuList)
+            
+        changelog_assignee_created = convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
         creator_name = issue["fields"]["creator"].get("displayName", "") if "creator" in issue[
                 "fields"] else None
@@ -132,8 +135,7 @@ def issue_details_data(request,id):
         customer_contact = issue["fields"].get("customfield_16032", "")
         snow_request_no = issue["fields"].get("customfield_16265", "")
         snow_case_no = issue["fields"].get("customfield_16266", "")
-        subtask = issue["fields"]["issuetype"].get("subtask", "")
-
+        
         assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue[
             "fields"] else None
         assignee_email = issue["fields"]["assignee"].get("emailAddress", "") if "assignee" in issue[
@@ -181,24 +183,6 @@ def issue_details_data(request,id):
             "issue_status": issue_status
             }
 
-        # Additional processing and enriching the issue_data_dict
-        desc = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
-        report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-        customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
-        sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
-
-        if sdo_map:
-            issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
-        if report_data:
-            issue_data_dict['report_status'] = str(report_data.report_status.id)
-            issue_data_dict['report_error'] = report_data.error_msg
-        else:
-            issue_data_dict['report_status'] = '0'
-        if desc is not None:
-            issue_data_dict['menu_description'] = desc.menu_description
-        if customer_map:
-            issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
-            issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
-            issue_data_dict['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
-
+       # get function for addition data
+        issue_data_dict = getAdditionDataBKey(issue_data_dict)
         return [issue_data_dict]  # Returning a list with a single record and total count

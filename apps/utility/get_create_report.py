@@ -6,9 +6,10 @@ import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
 from datetime import datetime
-from apps.utility import utils
+from apps.utility.utils import getAdditionDataBKey, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
 from .jqlconfig import headers, auth
 from .jqlpayload_details import construct_payload
+from .issue_bykey import issue_bykey
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
@@ -69,7 +70,7 @@ def jiradata_create_report(id):
         description = issue["fields"].get('description', "")
 
         if description:
-            capability, product, product_version, frequency = utils.get_productCapability(description)
+            capability, product, product_version, frequency = get_productCapability(description)
 
         # Extract assignee and created date from changelog
         for history in changelog:
@@ -94,15 +95,24 @@ def jiradata_create_report(id):
             # getting activit menuid string
             activit_menu_string = activity_split_string[2]
             # call function to get menu id and partner
-            menu_card, partner = utils.find_menuid_in_string(activit_menu_string,menuList)
+            menu_card, partner = find_menuid_in_string(activit_menu_string,menuList)
 
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(issue_summary,menuList)
+            menu_card, partner = find_menuid_in_string(issue_summary,menuList)
 
         if menu_card is None:
-            menu_card, partner = utils.find_menuid_in_string(parent_summary,menuList)
+            menu_card, partner = find_menuid_in_string(parent_summary,menuList)
+
+        if menu_card is None and subtasks is True:
+                #getting parent activity short name
+                parent_activity_string = issue_bykey(parent_key)
+                if parent_activity_string:
+                    parent_activity_name = parent_activity_string.split('.')
+                    # getting activity project id
+                    parent_activit_id = parent_activity_name[0]
+                    menu_card, partner = find_menuid_in_string(parent_activit_id,menuList)
             
-        changelog_assignee_created = utils.convert_date(changelog_assignee_created)
+        changelog_assignee_created = convert_date(changelog_assignee_created)
         creator_email = issue["fields"]["creator"].get("emailAddress", "") if "creator" in issue["fields"] else None
         creator_name = issue["fields"]["creator"].get("displayName", "") if "creator" in issue[
             "fields"] else None
@@ -110,9 +120,9 @@ def jiradata_create_report(id):
         partner = partner
         activit_project_id = activit_project_id
         project_name = issue["fields"]["project"].get("name", "")
-        #project_key = issue["fields"]["project"].get("key", "")
+        project_key = issue["fields"]["project"].get("key", "")
         # get customer id from project key
-        #customer_id = project_key[2:]
+        customer_id = project_key[2:]
         customer_email = issue["fields"].get("customfield_16262", "")
         #customer_contact_no = issue["fields"].get("customfield_16263", "")
         customer_contact = issue["fields"].get("customfield_16032", "")
@@ -142,14 +152,6 @@ def jiradata_create_report(id):
             "creator_name": creator_name,  # customer contact
             "customer_contact": customer_contact  # customer contact
         }
-
-        # Additional processing and enriching the issue_data_dict
-        report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-
-        if report_data:
-            issue_data_dict['report_status'] = str(report_data.report_status.id)
-            issue_data_dict['report_error'] = report_data.error_msg
-        else:
-            issue_data_dict['report_status'] = '1'
-
+        # get function for addition data
+        issue_data_dict = getAdditionDataBKey(issue_data_dict)
         return issue_data_dict  # Returning a list with a single record and total count
