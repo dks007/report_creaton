@@ -14,7 +14,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 
-def jiradata_create_report(request, id):
+def jiradata_create_report(id):
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 

@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
     SubCapabilityMaster, CustomerContactMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, ProjectMaster, LogoMaster
+from apps.utility.create_upload_file import create_folder_and_upload_to_sharepoint
 
 
 def success_report(data: dict, logo_id=None):
@@ -53,23 +54,45 @@ def success_report(data: dict, logo_id=None):
             created_by=user,
             updated_by=user
         )
+    # create report based on the action
+    success_report_data = None
+    if data.get('action') == 'saved':
+        success_report_data = SuccessReport.objects.update_or_create(
+            jira_key=data.get('issue_key'),
+            defaults={
+                'parent_key': data.get('parent_key'),
+                'menu_card': menu_card,
+                'product': product,
+                'capability': capability,
+                'snow_case_no': data.get('snow_case_no'),
+                'report_status': report_status,
+                "expert": expert,
+                "customer": customer,
+                "customer_contact": customer_contact,
+                "logo_id": logo_id
+            }
 
-    success_report_data = SuccessReport.objects.update_or_create(
-        jira_key=data.get('issue_key'),
-        defaults={
-            'parent_key': data.get('parent_key'),
-            'menu_card': menu_card,
-            'product': product,
-            'capability': capability,
-            'snow_case_no': data.get('snow_case_no'),
-            'report_status': report_status,
-            "expert": expert,
-            "customer": customer,
-            "customer_contact": customer_contact,
-            "logo_id": logo_id
-        }
+        )
+    elif data.get('action') == 'created':
+        success_report_data = SuccessReport.objects.get(jira_key=data.get('issue_key'))
+        if success_report_data is None:
+            success_report_data = SuccessReport.objects.update_or_create(
+                jira_key=data.get('issue_key'),
+                defaults={
+                    'parent_key': data.get('parent_key'),
+                    'menu_card': menu_card,
+                    'product': product,
+                    'capability': capability,
+                    'snow_case_no': data.get('snow_case_no'),
+                    'report_status': report_status,
+                    "expert": expert,
+                    "customer": customer,
+                    "customer_contact": customer_contact,
+                    "logo_id": logo_id
+                }
 
-    )
+            )
+        create_folder_and_upload_to_sharepoint(success_report_data)
 
     return success_report_data
 
@@ -102,11 +125,11 @@ def all_master_list():
     json_customer_contact = json.loads(serialize('json', customer_contact))
     json_customer = json.loads(serialize('json', customer)) """
 
-    list_menu_card          = list(menu_card),
-    list_product            = list(product),
-    list_customer_contact   = list(customer_contact),
-    list_customer           = list(customer),
-    list_cap_subcap         = list(cap_subcap)
+    list_menu_card = list(menu_card),
+    list_product = list(product),
+    list_customer_contact = list(customer_contact),
+    list_customer = list(customer),
+    list_cap_subcap = list(cap_subcap)
 
     return list_menu_card, list_product, list_cap_subcap, list_customer_contact, list_customer
 
