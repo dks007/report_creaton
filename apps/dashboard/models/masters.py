@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
 # Base Model appl for all masters
 class BaseModel(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -11,6 +12,18 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+# Expert master
+class ExpertMaster(models.Model):
+    expert_account_id = models.CharField(max_length=100, null=True, blank=True)
+    expert_name = models.CharField(max_length=100, unique=True)
+    expert_email = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return f"ExpertMaster {self.id} - {self.expert_name}"
+
+
 # Status Master
 class StatusMaster(models.Model):
     status_name = models.CharField(max_length=25, unique=True)
@@ -18,27 +31,38 @@ class StatusMaster(models.Model):
 
     def __str__(self):
         return self.status_name
-    
-#customer Master
-class CustomerMaster(BaseModel):
+
+
+# customer Master
+class CustomerMaster(models.Model):
     customer_id = models.CharField(max_length=100, unique=True)
     customer_name = models.CharField(max_length=100)
+    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.customer_name
-# Customer COntact master   
+
+
+# Customer COntact master
 class CustomerContactMaster(BaseModel):
     customer_contact = models.CharField(max_length=100, unique=True)
-    customer_email = models.CharField(max_length=255,null=True)
+    customer_email = models.CharField(max_length=255, null=True)
+    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
+    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"CustomerContact {self.id} - {self.customer_contact}"
-# Region Master  
+
+
+# Region Master
 class RegionMaster(BaseModel):
     region_name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.region_name
+
+
 # Project Master
 class ProjectMaster(BaseModel):
     project_name = models.CharField(max_length=100, unique=True)
@@ -47,7 +71,8 @@ class ProjectMaster(BaseModel):
 
     def __str__(self):
         return f"{self.project_name}"
-    
+
+
 # Customer mapping
 class CustomerMapping(BaseModel):
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE)
@@ -65,14 +90,16 @@ class CustomerMapping(BaseModel):
     def __str__(self):
         return f"CustomerMapping {self.id} - {self.customer.customer_name}"
 
-#CSM master
+
+# CSM master
 class CSMMaster(BaseModel):
     csm_name = models.CharField(max_length=100, unique=True)
     csm_email = models.CharField(max_length=255)
 
     def __str__(self):
         return self.csm_name
-    
+
+
 # SDM master
 class SDMMaster(BaseModel):
     sdm_name = models.CharField(max_length=100, unique=True)
@@ -80,15 +107,17 @@ class SDMMaster(BaseModel):
 
     def __str__(self):
         return self.sdm_name
-    
+
+
 # PSM master
 class PSMMaster(BaseModel):
     psm_name = models.CharField(max_length=50, unique=True)
-    psm_email = models.CharField(max_length=255,blank=True)
+    psm_email = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.psm_name
-    
+
+
 # Industry master
 class IndustryMaster(BaseModel):
     industry_type_name = models.CharField(max_length=100, unique=True)
@@ -96,7 +125,8 @@ class IndustryMaster(BaseModel):
 
     def __str__(self):
         return self.industry_type_name
-    
+
+
 # Success Element Master
 class SuccessElementsMaster(BaseModel):
     success_element_name = models.CharField(max_length=100, unique=True)
@@ -104,13 +134,15 @@ class SuccessElementsMaster(BaseModel):
     def __str__(self):
         return self.success_element_name
 
+
 # Success Service Master
 class SuccessServiceMaster(BaseModel):
     success_service_name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.success_service_name
-    
+
+
 # menu card master
 class MenuCardMaster(BaseModel):
     menu_card = models.CharField(max_length=10, unique=True)
@@ -123,6 +155,7 @@ class MenuCardMaster(BaseModel):
     def __str__(self):
         return f"MenuCardMaster {self.id} - {self.menu_card}"
 
+
 # Sdo master
 class SdoMaster(BaseModel):
     sdo_name = models.CharField(max_length=100, unique=True)
@@ -130,7 +163,8 @@ class SdoMaster(BaseModel):
 
     def __str__(self):
         return f"SdoMaster - {self.sdo_name}"
-    
+
+
 # Menu Sdo Mapping
 class MenuSdoMapping(BaseModel):
     menu_card = models.ForeignKey(MenuCardMaster, on_delete=models.PROTECT)
@@ -139,24 +173,17 @@ class MenuSdoMapping(BaseModel):
     def __str__(self):
         return f"MenuSdoMapping {self.id} - MenuCard: {self.menu_card.menu_card}, Sdo: {self.sdo.sdo_name}"
 
-# Expert master
-class ExpertMaster(BaseModel):
-    expert_account_id = models.CharField(max_length=100)
-    expert_name = models.CharField(max_length=100, unique=True)
-    expert_email = models.CharField(max_length=255,null=True)
 
-    def __str__(self):
-        return f"ExpertMaster {self.id} - {self.expert_name}"
-    
- # Creator master   
+# Creator master
 class CreatorMaster(BaseModel):
     creator_account_id = models.CharField(max_length=100)
     creator_name = models.CharField(max_length=100, unique=True)
-    creator_email = models.CharField(max_length=255,null=True)
+    creator_email = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
-    
+
+
 # Logo Master
 class LogoMaster(BaseModel):
     logo_file_name = models.CharField(max_length=50, unique=True)
@@ -168,6 +195,7 @@ class LogoMaster(BaseModel):
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"
 
+
 # Report Status Master
 class ReportStatusMaster(BaseModel):
     report_status_name = models.CharField(max_length=25, unique=True)
@@ -175,6 +203,7 @@ class ReportStatusMaster(BaseModel):
 
     def __str__(self):
         return f"ReportStatusMaster {self.id} - {self.report_status_name}"
+
 
 # Product Master
 class ProductMaster(BaseModel):
@@ -184,6 +213,7 @@ class ProductMaster(BaseModel):
     def __str__(self):
         return f"ProductMaster {self.id} - {self.product_name}"
 
+
 # Capability Master
 class CapabilityMaster(BaseModel):
     capability_name = models.CharField(max_length=100, unique=True)
@@ -191,6 +221,7 @@ class CapabilityMaster(BaseModel):
 
     def __str__(self):
         return f"CapabilityMaster {self.id} - {self.capability_name}"
+
 
 # Sub Capability Master
 class SubCapabilityMaster(BaseModel):
@@ -201,13 +232,14 @@ class SubCapabilityMaster(BaseModel):
     def __str__(self):
         return f"SubCapabilityMaster {self.id} - {self.sub_capability_name}"
 
-#external customer contact
+
+# external customer contact
 class ExCustomerContactsMaster(BaseModel):
-    customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE,null=True, blank=True )
+    customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE, null=True, blank=True)
     ex_customer_name = models.CharField(max_length=100)
     ex_customer_email = models.TextField(null=True, blank=True)
     ex_customer_id = models.CharField(max_length=100, unique=True)
     description = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return f"ExCustomerContactsMas {self.id} - {self.sub_capability_name}"
-

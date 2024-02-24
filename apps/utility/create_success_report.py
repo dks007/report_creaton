@@ -20,39 +20,28 @@ def success_report(data: dict, logo_id=None):
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
     customer_contact = CustomerContactMaster.objects.filter(customer_contact=data.get('customer_contact')).first()
     #creator = CreatorMaster.objects.filter(creator_name=data.get('creator_name')).first()
-    user = User.objects.get(id=1)
-    if expert is None:
-        ExpertMaster.objects.create(
-            expert_account_id='1',
-            expert_email='expert@gmail.com',
-            expert_name=data.get('expert_name'),
-            created_by=user,
-            updated_by=user
-        )
     if data.get('action') == 'saved':
         report_status = ReportStatusMaster.objects.get(id=4)
     else:
         report_status = ReportStatusMaster.objects.get(id=1)
-    if customer_contact is None:
-        customer_contact = CustomerContactMaster.objects.create(
-            customer_contact=data.get('customer_contact'),
-            customer_email=data.get('customer_email'),
-            created_by=user,
-            updated_by=user
-        )
     if expert is None:
         expert = ExpertMaster.objects.create(
             expert_name=data.get('expert_name'),
             expert_email=data.get('expert_email'),
-            created_by=user,
-            updated_by=user
         )
     if customer is None:
         customer = CustomerMaster.objects.create(
             customer_name=data.get('customer_name'),
             customer_email=data.get('customer_email'),
-            created_by=user,
-            updated_by=user
+            created_by=expert,
+            updated_by=expert
+        )
+    if customer_contact is None:
+        customer_contact = CustomerContactMaster.objects.create(
+            customer_contact=data.get('customer_contact'),
+            customer_email=data.get('customer_email'),
+            created_by=expert,
+            updated_by=expert
         )
     # create report based on the action
     success_report_data = None
