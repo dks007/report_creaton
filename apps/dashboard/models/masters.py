@@ -37,8 +37,8 @@ class StatusMaster(models.Model):
 class CustomerMaster(models.Model):
     customer_id = models.CharField(max_length=100, unique=True)
     customer_name = models.CharField(max_length=100)
-    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_created',default=1)
+    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_updated',default=1)
 
     def __str__(self):
         return self.customer_name
@@ -48,8 +48,8 @@ class CustomerMaster(models.Model):
 class CustomerContactMaster(BaseModel):
     customer_contact = models.CharField(max_length=100, unique=True)
     customer_email = models.CharField(max_length=255, null=True)
-    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
-    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_created_contacts',default=1)
+    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_updated_contacts',default=1)
 
     def __str__(self):
         return f"CustomerContact {self.id} - {self.customer_contact}"
