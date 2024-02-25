@@ -7,6 +7,7 @@ import json
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from django.contrib.auth.decorators import permission_required
 
 # local import
 from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
@@ -21,6 +22,7 @@ from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, Capabi
 from apps.dashboard.models.models import SuccessReport
 
 
+@permission_required(IFSPermission)
 def get_issue_list(request):
     """
     used to fetch all issues
@@ -32,6 +34,7 @@ def get_issue_list(request):
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
 
+@permission_required(IFSPermission)
 def get_issue_details(request, id):
     """
     used to fetch specific issue
@@ -44,6 +47,7 @@ def get_issue_details(request, id):
 
 
 # getting first if data already saved in database 2nd get from jira
+@permission_required(IFSPermission)
 def get_create_report(request, id):
     """
     used to fetch specific issue
@@ -86,6 +90,7 @@ class MenuViewSet(viewsets.ModelViewSet):
     """
     queryset = MenuCardMaster.objects.all()
     serializer_class = MenuListSerializer
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -110,6 +115,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectMaster.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -126,6 +132,7 @@ class CapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = CapabilityMaster.objects.all()
     serializer_class = CapabilitySerializer
+    permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -144,6 +151,7 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = SubCapabilityMaster.objects.all()
     serializer_class = SubCapabilitySerializer
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -199,9 +207,11 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer_class()(instance)
         return Response({'data': serializer.data, 'status': status.HTTP_200_OK})
 
+
 # create popup report
 class SuccessReportViewSet1(viewsets.GenericViewSet):
     serializer_class = SuccessReportSerializer1
+    permission_classes = [IFSPermission]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
