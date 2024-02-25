@@ -57,11 +57,11 @@ def get_create_report(request, id):
         menu_card, product, capsubcap, customer_contact, customer = all_master_list()
         if not response:
             response = jiradata_create_report(id)
-            response['menu_card_list'] = menu_card
-            response['product_list'] = product
+            response['menu_card_list'] = menu_card[0]
+            response['product_list'] = product[0]
             response['capsubcap_list'] = capsubcap
-            response['customer_contact_list'] = customer_contact
-            response['customer_list'] = customer
+            response['customer_contact_list'] = customer_contact[0]
+            response['customer_list'] = customer[0]
 
         else:
             response = {
