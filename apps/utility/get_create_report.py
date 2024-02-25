@@ -26,9 +26,9 @@ def jiradata_create_report(id):
         tuple: response data provide individual records of issue key.
     """
     # Construct payload using jqlpayload.py
-    payload = construct_payload(request, id)
+    payload = construct_payload(id)
     # Getting request
-    issue_key = request.GET.get('issue_key')
+    #issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
 
     url = os.getenv('JIRA_URL')
@@ -144,7 +144,7 @@ def jiradata_create_report(id):
             "menu_card": menu_card,
             "capability": capability,
             "product": product,
-            "project_name": project_name,  # customer name/proect name
+            "customer_name": project_name,  # customer name/proect name
             "snow_case_no": snow_case_no,
             "assignee_email":assignee_email,
             "customer_email": customer_email,
