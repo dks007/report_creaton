@@ -21,9 +21,8 @@ NUMBER = {
 }
 
 none = "none"
-
 # Super Admin string constant for 'role'
-SUPER_ADMIN = "Admin"
+SUPER_ADMIN = "Super Admin"
 
 # Define jwt_token_expiration time in minutes for now token will expire after 3 days
 JWT_TOKEN_EXPIRATION = 3 * 24 * 60
@@ -34,25 +33,23 @@ FILE_EXTENSION = ("jpeg", "jpg", "png")
 # Define file size in bytes(5MB =  5 * 1024 * 1024)
 FILE_SIZE = 5 * 1024 * 1024
 
-# String constant for configurable date for allocation lock period
-ALLOCATION_LOCK_DATE = 1
-
-# Task status"""
+# article status
 REPORT_STATUS = (
-    ('0', 'Not Started'),
-    ('1', 'In Progress'),
-    ('2', 'Created'),
-    ('3', 'Create Error'),
-    ('4', 'Unknown')
+    ('1', 'Not Created'),
+    ('2', 'Progress'),
+    ('3', 'Created'),
+    ('4', 'Saved'),
+    ('5', 'Error')
 )
-
-# constant PROJECT_NAME
+"""
+Define report status
+in a number"""
+NOT_CREATED = 1
+CREATING = 2
+CREATED = 3
+SAVED = 4
+ERROR = 5
+UNKNOWN = 6
 PROJECT_NAME = 'Success Tool'
-
-# Define the byte into kb
-BYTE_IMAGE_SIZE = 1024
-
-# validate file size
-MAX_FILE_SIZE = 1024 * 1024 * 5
 
 DATE_FORMAT = '%Y-%m-%d'
