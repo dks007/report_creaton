@@ -45,7 +45,7 @@ class CustomerMaster(models.Model):
 
 
 # Customer COntact master
-class CustomerContactMaster(BaseModel):
+class CustomerContactMaster(models.Model):
     customer_contact = models.CharField(max_length=100, unique=True)
     customer_email = models.CharField(max_length=255, null=True)
     created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_created_contacts',default=1)
@@ -234,12 +234,14 @@ class SubCapabilityMaster(BaseModel):
 
 
 # external customer contact
-class ExCustomerContactsMaster(BaseModel):
+class ExCustomerContactsMaster(models.Model):
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE, null=True, blank=True)
     ex_customer_name = models.CharField(max_length=100)
     ex_customer_email = models.TextField(null=True, blank=True)
     ex_customer_id = models.CharField(max_length=100, unique=True)
     description = models.TextField(null=True, blank=True)
+    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='excustomer_created',default=1)
+    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='excustomer_updated',default=1)
 
     def __str__(self):
         return f"ExCustomerContactsMas {self.id} - {self.sub_capability_name}"
