@@ -22,7 +22,7 @@ from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, Capabi
 from apps.dashboard.models.models import SuccessReport
 
 
-@permission_required(IFSPermission)
+#@permission_required(IFSPermission)
 def get_issue_list(request):
     """
     used to fetch all issues
@@ -34,20 +34,33 @@ def get_issue_list(request):
         return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
 
 
-@permission_required(IFSPermission)
+#@permission_required(IFSPermission)
 def get_issue_details(request, id):
     """
-    used to fetch specific issue
+    Fetches details of a specific issue.
+
+    Parameters:
+    - request: The HTTP request object.
+    - id: The ID of the issue to fetch.
+
+    Returns:
+    - JsonResponse: A JSON response containing issue details or an error message.
     """
     if request.method == 'GET':
-        response = issue_details_data(request, id)
-        return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
+        try:
+            response = issue_details_data(request, id)
+            return JsonResponse({'data': response, 'status': status.HTTP_200_OK})
+        except Issue.DoesNotExist:
+            return JsonResponse({'error': 'Issue not found', 'status': status.HTTP_404_NOT_FOUND})
+        except Exception as e:
+            return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
     else:
-        return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
+        return JsonResponse({'error': 'Method not allowed', 'status': status.HTTP_405_METHOD_NOT_ALLOWED})
+
 
 
 # getting first if data already saved in database 2nd get from jira
-@permission_required(IFSPermission)
+#@permission_required(IFSPermission)
 def get_create_report(request, id):
     """
     used to fetch specific issue
