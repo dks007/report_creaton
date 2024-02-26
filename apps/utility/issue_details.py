@@ -150,7 +150,6 @@ def issue_details_data(request,id):
             "issue_key": issue_key,
             "issue_summary": issue_summary,
             "menu_card": menu_card,
-            "menu_description": menu_description,
             "activity_short_name": activity_short_name,
             "activit_project_id": activit_project_id,
             "subtasks_list": subtasks_list,

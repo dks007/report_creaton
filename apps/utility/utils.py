@@ -139,6 +139,7 @@ def getSuccessReportData(issueKey):
 def getAdditionDataBKey(issue_data_dict):
     # Additional processing and enriching the issue_data_dict
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
+        desc = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('issue_key')).first()
         # check if records exists in success report table
         if report_data:
             issue_data_dict['report_status'] = str(report_data.report_status.id)
@@ -146,6 +147,14 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['sdo_name'] = str(report_data.sdo.sdo_name)
             issue_data_dict['csm_name'] = str(report_data.csm.csm_name)
             issue_data_dict['sdm_name'] = str(report_data.sdm.sdm_name)
+            issue_data_dict['menu_description'] = str(report_data.menu_card.menu_description)
+            issue_data_dict['menu_card'] = str(report_data.menu_card.menu_card)
+            issue_data_dict['customer_name'] = str(report_data.customer.customer_name)
+            issue_data_dict['snow_case_no'] = str(report_data.snow_case_no)
+            issue_data_dict['customer_contact'] = str(report_data.customer_contact.customer_contact)
+            issue_data_dict['product'] = str(report_data.product.product_name)
+            issue_data_dict['capability'] = str(report_data.capability.capability_name)
+            issue_data_dict['sub_capability'] = str(report_data.sub_capability.sub_capability_name)
         else:
             # get sdm, sdo and csm to save in success report from jira
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
@@ -155,6 +164,9 @@ def getAdditionDataBKey(issue_data_dict):
                 issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
             else:
                 issue_data_dict['sdo_name']=''
+
+            if desc is not None:
+                issue_data_dict['menu_description'] = desc.menu_description if desc.menu_description else ''
 
             if customer_map:
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
