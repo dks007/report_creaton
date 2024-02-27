@@ -88,6 +88,7 @@ def issue_list_data(request):
                 "issue_key": issue_key,
                 "issue_summary": issue_summary,
                 "menu_card": menu_card,
+                "customer_id": customer_id,
                 "menu_description": menu_description,
                 "subtasks_list": subtasks_list,
                 "partner": partner,
@@ -114,7 +115,7 @@ def issue_list_data(request):
             report_data = SuccessReport.objects.filter(jira_key=issue_key, status=1).first()
             customer_map = CustomerMapping.objects.filter(customer__customer_id=customer_id, status=1).first()
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=menu_card_id, status=1, sdo__status=1).first()
-
+            print(customer_map)
             if sdo_map:
                 dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
             if report_data:

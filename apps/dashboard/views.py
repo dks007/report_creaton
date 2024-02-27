@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import permission_required
 
 # local import
 from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
-    SubCapabilitySerializer, SuccessReportSerializer, SuccessReportSerializer1
+    SubCapabilitySerializer, SuccessReportSerializer, SuccessCreateReportSerializer
 from ..accounts.permissions import IFSPermission
 from ..utility.create_success_report import success_report, convert_json, all_master_list, upload_logo_image
 from ..utility.get_create_report import jiradata_create_report
@@ -49,8 +49,8 @@ def get_issue_details(request, id):
     if request.method == 'GET':
         try:
             response = issue_details_data(request, id)
-            return JsonResponse({'data': response, 'status': status.HTTP_200_OK})
-        except Issue.DoesNotExist:
+            return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
+        except id.DoesNotExist:
             return JsonResponse({'error': 'Issue not found', 'status': status.HTTP_404_NOT_FOUND})
         except Exception as e:
             return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
@@ -103,7 +103,7 @@ class MenuViewSet(viewsets.ModelViewSet):
     """
     queryset = MenuCardMaster.objects.all()
     serializer_class = MenuListSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -128,7 +128,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectMaster.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -145,7 +145,7 @@ class CapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = CapabilityMaster.objects.all()
     serializer_class = CapabilitySerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -164,7 +164,7 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = SubCapabilityMaster.objects.all()
     serializer_class = SubCapabilitySerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -195,7 +195,7 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
     """
     queryset = SuccessReport.objects.all()
     serializer_class = SuccessReportSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -222,9 +222,9 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
 
 
 # create popup report
-class SuccessReportViewSet1(viewsets.GenericViewSet):
-    serializer_class = SuccessReportSerializer1
-    permission_classes = [IFSPermission]
+class SuccessCreateReportViewSet(viewsets.GenericViewSet):
+    serializer_class = SuccessCreateReportSerializer
+    #permission_classes = [IFSPermission]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)

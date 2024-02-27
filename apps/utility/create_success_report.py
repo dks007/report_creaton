@@ -33,13 +33,7 @@ def success_report(data: dict, logo_id=None):
             expert_name=data.get('expert_name'),
             expert_email=data.get('expert_email'),
         )
-    if customer is None:
-        customer = CustomerMaster.objects.create(
-            customer_name=data.get('customer_name'),
-            customer_email=data.get('customer_email'),
-            created_by=expert,
-            updated_by=expert
-        )
+        
     if customer_contact is None:
         customer_contact = CustomerContactMaster.objects.create(
             customer_contact=data.get('customer_contact'),
@@ -69,6 +63,7 @@ def success_report(data: dict, logo_id=None):
             }
 
         )
+
     elif data.get('action') == 'created':
         success_report_data = SuccessReport.objects.get(jira_key=data.get('issue_key'))
         if success_report_data is None:
@@ -91,7 +86,8 @@ def success_report(data: dict, logo_id=None):
                 }
 
             )
-        create_folder_and_upload_to_sharepoint(success_report_data)
+        #calling to shcedular to create report
+        #create_folder_and_upload_to_sharepoint(success_report_data)
 
     return success_report_data
 
