@@ -33,7 +33,7 @@ def success_report(data: dict, logo_id=None):
             expert_name=data.get('expert_name'),
             expert_email=data.get('expert_email'),
         )
-        
+
     if customer_contact is None:
         customer_contact = CustomerContactMaster.objects.create(
             customer_contact=data.get('customer_contact'),
@@ -115,12 +115,6 @@ def all_master_list():
     customer = CustomerMaster.objects.values('id', 'customer_name')
     cap_subcap = cap_subcap_array()
 
-    """ json_menu_card = json.loads(serialize('json', menu_card))
-    json_product = json.loads(serialize('json', product))
-    json_capability = json.loads(serialize('json', capability))
-    json_customer_contact = json.loads(serialize('json', customer_contact))
-    json_customer = json.loads(serialize('json', customer)) """
-
     list_menu_card = list(menu_card),
     list_product = list(product),
     list_customer_contact = list(customer_contact),
@@ -131,7 +125,6 @@ def all_master_list():
 
 
 # Saving logo data
-# Saving logo data
 def upload_logo_image(logo_file):
     try:
         # Create a new LogoMaster instance with the uploaded logo file
@@ -139,7 +132,7 @@ def upload_logo_image(logo_file):
             logo_file_name=logo_file.name,
             logo_file_type=logo_file.content_type,
             logo_file_size=logo_file.size,
-            logo=logo_file.read()  # Assuming BinaryField is used to store the image data
+            logo_image=logo_file  # Assuming logo_image is an ImageField
         )
         return logo.id, None
     except ValidationError as e:

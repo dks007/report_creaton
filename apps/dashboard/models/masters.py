@@ -57,7 +57,7 @@ class CustomerContactMaster(models.Model):
     updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_updated_contacts',default=1)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, default=1)
     def __str__(self):
         return f"CustomerContact {self.id} - {self.customer_contact}"
 
@@ -73,7 +73,7 @@ class RegionMaster(BaseModel):
 # Project Master
 class ProjectMaster(BaseModel):
     project_name = models.CharField(max_length=100, unique=True)
-    projectid = models.CharField(max_length=25, null=True)
+    projectid = models.CharField(max_length=25, null=True, blank=True)
     project_logo_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
@@ -85,13 +85,13 @@ class CustomerMapping(BaseModel):
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE)
     region = models.ForeignKey(RegionMaster, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(ProjectMaster, on_delete=models.CASCADE, null=True, blank=True)
-    opp_no = models.CharField(max_length=25, null=True)
+    opp_no = models.CharField(max_length=25, null=True, blank=True)
     success_service = models.ForeignKey('SuccessServiceMaster', on_delete=models.SET_NULL, null=True)
-    csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True)
-    psm = models.ForeignKey('PSMMaster', on_delete=models.SET_NULL, null=True)
-    sdm = models.ForeignKey('SDMMaster', on_delete=models.SET_NULL, null=True)
-    industry = models.ForeignKey('IndustryMaster', on_delete=models.SET_NULL, null=True)
-    success_elements = models.ForeignKey('SuccessElementsMaster', on_delete=models.SET_NULL, null=True)
+    csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
+    psm = models.ForeignKey('PSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
+    sdm = models.ForeignKey('SDMMaster', on_delete=models.SET_NULL, null=True, blank=True)
+    industry = models.ForeignKey('IndustryMaster', on_delete=models.SET_NULL, null=True, blank=True)
+    success_elements = models.ForeignKey('SuccessElementsMaster', on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -110,7 +110,7 @@ class CSMMaster(BaseModel):
 # SDM master
 class SDMMaster(BaseModel):
     sdm_name = models.CharField(max_length=100, unique=True)
-    sdm_email = models.CharField(max_length=255, blank=True)
+    sdm_email = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.sdm_name
@@ -119,7 +119,7 @@ class SDMMaster(BaseModel):
 # PSM master
 class PSMMaster(BaseModel):
     psm_name = models.CharField(max_length=50, unique=True)
-    psm_email = models.CharField(max_length=255, blank=True)
+    psm_email = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.psm_name
@@ -185,7 +185,7 @@ class MenuSdoMapping(BaseModel):
 class CreatorMaster(BaseModel):
     creator_account_id = models.CharField(max_length=100)
     creator_name = models.CharField(max_length=100, unique=True)
-    creator_email = models.CharField(max_length=255, null=True)
+    creator_email = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
