@@ -194,10 +194,11 @@ class CreatorMaster(BaseModel):
 # Logo Master
 class LogoMaster(BaseModel):
     logo_file_name = models.CharField(max_length=50, unique=True)
-    logo_file_type = models.CharField(max_length=10, null=True)
+    logo_file_type = models.CharField(max_length=10, null=True, blank=True)
     logo_file_size = models.IntegerField()
     logo_url = models.CharField(max_length=255)
-    logo = models.BinaryField(null=True)
+    logo = models.BinaryField(null=True, blank=True)
+    logo_image = models.ImageField(upload_to='apps/client_image')
 
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"

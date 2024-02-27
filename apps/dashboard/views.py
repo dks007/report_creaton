@@ -202,10 +202,10 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
         create report
         """
         serializer = self.get_serializer_class()(data=request.data)
-        serializer.is_valid()
-        serializer.save()
-        return Response({'msg': 'success-report created successfully!', 'status': status.HTTP_201_CREATED})
-
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'msg': 'success-report created successfully!', 'status': status.HTTP_201_CREATED})
+        return Response({'msg': serializer.errors, 'status': status.HTTP_400_BAD_REQUEST})
     def update(self, request, *args, **kwargs):
         instance = self.get_queryset().filter(id=kwargs.get('pk')).first()
         if instance is not None:

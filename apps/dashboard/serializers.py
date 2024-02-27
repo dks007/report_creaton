@@ -24,7 +24,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectMaster
         #fields = '__all__'
-        fields = ['id', 'product_name']
+        fields = ['id', 'project_name']
 
 class CustomerContactSerializer(serializers.ModelSerializer):
     """
@@ -95,19 +95,13 @@ class LogoSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = LogoMaster
-        def get_logo(self, obj):
-            if obj.logo:
-                return base64.b64encode(obj.logo).decode('utf-8')
-            return None
-        fields = ('logo_file_name', 'logo_file_size', 'logo_url', 'status','logo')
+        fields = ('logo_file_name', 'logo_file_size', 'logo_url', 'status', 'logo', 'logo_image')
 
 
 class SuccessReportSerializer(serializers.ModelSerializer):
     """
     success-report serializer, used to serializer success-report objects,
     """
-    creator = CreatorSerializer()
-    expert = ExpertSerializer()
     logo = LogoSerializer()
 
     class Meta:
@@ -146,11 +140,3 @@ class SuccessCreateReportSerializer(serializers.Serializer):
     # New field for logo file upload
     #logo = serializers.ImageField(required=True)
     #logo_url = serializers.CharField(max_length=100)
-
-    def validate_logo(self, value):
-        # Validate image file format
-        if value:
-            format = value.content_type.split('/')[1]
-            if format not in ['jpeg', 'jpg', 'png']:
-                raise ValidationError("Only JPEG and PNG formats are allowed for the logo.")
-        return value
