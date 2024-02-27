@@ -19,6 +19,9 @@ class ExpertMaster(models.Model):
     expert_account_id = models.CharField(max_length=100, null=True, blank=True)
     expert_name = models.CharField(max_length=100, unique=True)
     expert_email = models.CharField(max_length=255, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
@@ -39,7 +42,9 @@ class CustomerMaster(models.Model):
     customer_name = models.CharField(max_length=100)
     created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_created',default=1)
     updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_updated',default=1)
-
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
     def __str__(self):
         return self.customer_name
 
@@ -50,7 +55,9 @@ class CustomerContactMaster(models.Model):
     customer_email = models.CharField(max_length=255, null=True)
     created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_created_contacts',default=1)
     updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_updated_contacts',default=1)
-
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
     def __str__(self):
         return f"CustomerContact {self.id} - {self.customer_contact}"
 
@@ -242,6 +249,8 @@ class ExCustomerContactsMaster(models.Model):
     description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='excustomer_created',default=1)
     updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='excustomer_updated',default=1)
-
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
     def __str__(self):
-        return f"ExCustomerContactsMas {self.id} - {self.sub_capability_name}"
+        return f"ExCustomerContactsMas {self.id} - {self.ex_customer_name}"

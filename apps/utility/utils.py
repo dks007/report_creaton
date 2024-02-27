@@ -155,6 +155,7 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['product'] = str(report_data.product.product_name)
             issue_data_dict['capability'] = str(report_data.capability.capability_name)
             issue_data_dict['sub_capability'] = str(report_data.sub_capability.sub_capability_name)
+            #issue_data_dict['logo'] = str(report_data.logo.logo)
         else:
             # get sdm, sdo and csm to save in success report from jira
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
@@ -178,3 +179,20 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['report_status'] = '1'
             issue_data_dict['report_error'] = ''
         return issue_data_dict
+
+# get issue description text
+
+def get_description_content(obj):
+    if "content" in obj:
+        content = obj["content"]
+        text_content = ""
+        for item in content:
+            if item["type"] == "paragraph":
+                paragraph_content = item["content"]
+                for element in paragraph_content:
+                    if element["type"] == "text":
+                        text_content += element["text"]
+                    elif element["type"] == "hardBreak":
+                        text_content += "\n"
+                text_content += "\n"  # Add newline after each paragraph
+        return text_content.strip()  # Remove leading/trailing whitespace

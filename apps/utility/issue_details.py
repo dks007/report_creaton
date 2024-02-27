@@ -6,7 +6,7 @@ import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
 from datetime import datetime
-from apps.utility.utils import getAdditionDataBKey, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
+from apps.utility.utils import getAdditionDataBKey,get_description_content, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
 from .jqlconfig import headers, auth
 from .jqlpayload_details import construct_payload
 from .issue_bykey import issue_bykey
@@ -62,13 +62,15 @@ def issue_details_data(request,id):
         product=''
         product_version=''
         frequency=''
+        description_content=''
         changelog = issue.get("changelog", {}).get("histories", [])
         changelog_assignee_created = None
         #get subtask list
         subtasks = issue["fields"].get('subtasks', [])
         subtasks_list = extract_subtasks_data(subtasks)
         description = issue["fields"].get('description', "")
-        if description: 
+        if description:
+            description_content = get_description_content(description) 
             capability, product, product_version, frequency=get_productCapability(description)
 
         # Extract assignee and created date from changelog
@@ -179,7 +181,8 @@ def issue_details_data(request,id):
             "assignee_name": assignee_name,
             "creator_name":creator_name,
             "assignee_id": assignee_id,
-            "issue_status": issue_status
+            "issue_status": issue_status,
+            "description_content":description_content
             }
 
        # get function for addition data

@@ -1,6 +1,7 @@
 # dashboard/serializers.py
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+import base64
 
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import (MenuCardMaster, CustomerMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
@@ -94,7 +95,11 @@ class LogoSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = LogoMaster
-        fields = ('logo_file_name', 'logo_file_size', 'logo_url', 'status')
+        def get_logo(self, obj):
+            if obj.logo:
+                return base64.b64encode(obj.logo).decode('utf-8')
+            return None
+        fields = ('logo_file_name', 'logo_file_size', 'logo_url', 'status','logo')
 
 
 class SuccessReportSerializer(serializers.ModelSerializer):
@@ -118,7 +123,7 @@ class SuccessReportSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class SuccessReportSerializer1(serializers.Serializer):
+class SuccessCreateReportSerializer(serializers.Serializer):
     """
     success-report serializer, used to serializer success-report objects,
     """
@@ -139,7 +144,8 @@ class SuccessReportSerializer1(serializers.Serializer):
     customer_contact = serializers.CharField(max_length=100)
     action = serializers.CharField(max_length=20, required=True)
     # New field for logo file upload
-    logo = serializers.ImageField(required=True)
+    #logo = serializers.ImageField(required=True)
+    #logo_url = serializers.CharField(max_length=100)
 
     def validate_logo(self, value):
         # Validate image file format
