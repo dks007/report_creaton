@@ -178,6 +178,7 @@ def getAdditionDataBKey(issue_data_dict):
 
             issue_data_dict['report_status'] = '1'
             issue_data_dict['report_error'] = ''
+            issue_data_dict['sub_capability'] =''
         return issue_data_dict
 
 # get issue description text
