@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-
+import os
 
 # Base Model appl for all masters
 class BaseModel(models.Model):
@@ -8,7 +8,7 @@ class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
     updated_date = models.DateTimeField(auto_now=True)
-    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, default=1)
 
     class Meta:
         abstract = True
@@ -21,7 +21,7 @@ class ExpertMaster(models.Model):
     expert_email = models.CharField(max_length=255, null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, default=1)
 
     def __str__(self):
         return f"ExpertMaster {self.id} - {self.expert_name}"
@@ -40,11 +40,11 @@ class StatusMaster(models.Model):
 class CustomerMaster(models.Model):
     customer_id = models.CharField(max_length=100, unique=True)
     customer_name = models.CharField(max_length=100)
-    created_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE,related_name='customer_created',default=1)
-    updated_by = models.ForeignKey(ExpertMaster, on_delete=models.CASCADE, related_name='customer_updated',default=1)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE,related_name='customer_created',default=1)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_updated',default=1)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, null=True, blank=True)
+    status = models.ForeignKey('StatusMaster', on_delete=models.PROTECT, default=1)
     def __str__(self):
         return self.customer_name
 
@@ -191,17 +191,25 @@ class CreatorMaster(BaseModel):
         return f"CreatorMaster {self.id} - {self.creator_name}"
 
 
-# Logo Master
-class LogoMaster(BaseModel):
-    logo_file_name = models.CharField(max_length=50, unique=True)
+""" # Logo Master   
+def get_upload_path(instance, filename):
+    base_directory = os.getenv('CLIENT_IMAGES', 'client_images/')
+    if not os.path.exists(base_directory):
+        os.makedirs(base_directory)
+    return os.path.join(base_directory, filename) """
+
+class LogoMaster(models.Model):
+    logo_file_name = models.TextField()
     logo_file_type = models.CharField(max_length=10, null=True, blank=True)
     logo_file_size = models.IntegerField()
-    logo_url = models.CharField(max_length=255)
+    logo_url = models.TextField(null=True, blank=True)
     logo = models.BinaryField(null=True, blank=True)
-    logo_image = models.ImageField(upload_to='apps/client_image')
+    logo_image = models.ImageField(upload_to="client_images",null=True, blank=True)
 
     def __str__(self):
         return f"LogoMaster {self.id} - {self.logo_file_name}"
+
+    
 
 
 # Report Status Master

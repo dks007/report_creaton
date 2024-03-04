@@ -31,9 +31,12 @@ ERROR_CODE = {
 }
 """Success message code"""
 SUCCESS_CODE = {
-    "3000": "ok",
+    ""
+    "3000": "Report saved successfully.",
     # Success code for password
-    "3001": "Sign up successfully"
+    "3001": "Report created successfully.",
+    "3002": "Report has already been created.",
+    "30013": "Report is in progress and cannot be updated."
 }
 """status code error"""
 STATUS_CODE_ERROR = {

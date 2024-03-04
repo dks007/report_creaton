@@ -63,39 +63,56 @@ def get_issue_details(request, id):
 #@permission_required(IFSPermission)
 def get_create_report(request, id):
     """
-    used to fetch specific issue
+    Fetches an existing report or creates a new one if not found.
+    
+    Parameters:
+        request (HttpRequest): The request object.
+        jira_key (str): The Jira key for the report.
+        
+    Returns:
+        JsonResponse: A JSON response with the report data or an error message.
     """
     if request.method == 'GET':
-        response = SuccessReport.objects.filter(jira_key=id).first()
-        menu_card, product, capsubcap, customer_contact, customer = all_master_list()
-        if not response:
-            response = jiradata_create_report(id)
-            response['menu_card_list'] = menu_card[0]
-            response['product_list'] = product[0]
-            response['capsubcap_list'] = capsubcap
-            response['customer_contact_list'] = customer_contact[0]
-            response['customer_list'] = customer[0]
-
-        else:
-            response = {
-                "issue_key": response.jira_key,
-                "menu_card": response.menu_card.menu_card,
-                "capability": response.capability.capability_name,
-                "product": response.product.product_name,
-                "project_name": response.product.product_name,
-                "snow_case_no": response.snow_case_no,
-                "expert_name": response.expert.expert_name,
-                "customer_contact": response.customer_contact.customer_contact,
-                "report_status": response.report_status.report_status_name,
-                'menu_card_list': json.loads(menu_card),
-                'product_list': json.loads(product),
-                'capability_list': json.loads(response.capability.capability_name),
-                'customer_list': json.loads(customer)
-            }
-        return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
+        try:
+            # Checking if report already exists in the table
+            report = SuccessReport.objects.filter(jira_key=id).first()
+            menu_card, product, capsubcap, customer_contact, customer = all_master_list()
+            if not report:
+                # Creating a new report
+                report_data = jiradata_create_report(request, id)
+                report_data['menu_card_list'] = menu_card[0]
+                report_data['product_list'] = product[0]
+                report_data['capsubcap_list'] = capsubcap
+                report_data['customer_contact_list'] = customer_contact[0]
+                report_data['customer_list'] = customer[0]
+            else:
+                report_data = {
+                    "issue_key": report.jira_key,
+                    "menu_card": report.menu_card.menu_card if report.menu_card else "",
+                    "sdo_name": report.sdo.sdo_name if report.sdo else "",
+                    "csm_name": report.csm.csm_name if report.csm else "",
+                    "sdm_name": report.sdm.sdm_name if report.sdm else "",
+                    "capability": report.capability.capability_name if report.capability else "",
+                    "sub_capability": report.sub_capability.sub_capability_name if report.sub_capability else "",
+                    "product": report.product.product_name if report.product else "",
+                    "customer_name": report.customer.customer_name if report.customer else "",
+                    "snow_case_no": report.snow_case_no,
+                    "expert_name": report.expert.expert_name if report.expert else "",
+                    "customer_contact": report.customer_contact.customer_contact if report.customer_contact else "",
+                    "report_status": report.report_status.report_status_name if report.report_status else "",
+                    'menu_card_list': menu_card[0],
+                    'product_list': product[0],
+                    'capsubcap_list': capsubcap,
+                    'customer_list': customer[0],
+                    'customer_contact_list': customer_contact[0],
+                    'logo_file_name': report.logo.logo_file_name if report.logo else "",
+                    'logo_url': report.logo.logo_url if report.logo else ""
+                }
+            return JsonResponse({'resdata': report_data, 'status': status.HTTP_200_OK})
+        except Exception as e:
+            return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
     else:
-        return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
-
+        return JsonResponse({'error': 'Method not allowed', 'status': status.HTTP_405_METHOD_NOT_ALLOWED})
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
@@ -232,11 +249,11 @@ class SuccessCreateReportViewSet(viewsets.GenericViewSet):
             # Upload logo image if provided
             logo_id = None
             if 'logo' in request.FILES:
-                logo_id, error_msg = upload_logo_image(request.FILES['logo'])
+                logo_id, error_msg = upload_logo_image(request.FILES['logo'],request.data.get('customer_name', ''))
                 if logo_id:
                     # Save success report with logo id
-                    processed_data = success_report(serializer.validated_data, logo_id)
-                    return Response({'data': convert_json(processed_data[0]), 'status': status.HTTP_201_CREATED})
+                    msg = success_report(serializer.validated_data, logo_id)
+                    return Response({'msg': msg, 'status': status.HTTP_201_CREATED})
                 else:
                     return Response({'msg': error_msg, 'status': status.HTTP_404_NOT_FOUND})
             else:

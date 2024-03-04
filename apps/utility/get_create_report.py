@@ -15,7 +15,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 
-def jiradata_create_report(id):
+def jiradata_create_report(request, id):
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 
@@ -26,7 +26,7 @@ def jiradata_create_report(id):
         tuple: response data provide individual records of issue key.
     """
     # Construct payload using jqlpayload.py
-    payload = construct_payload(id)
+    payload = construct_payload(request,id=None)
     # Getting request
     #issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
@@ -44,11 +44,10 @@ def jiradata_create_report(id):
 
     #json_file_path = "/home/rafique/Desktop/reporting/apps/utility/singledata.json"
     json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
-    # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file)
 
-        # if response.status_code == 200:
+    #if response.status_code == 200:
     if True:
         # issues_data = json.loads(response.text)
         issues_data = data
@@ -124,7 +123,7 @@ def jiradata_create_report(id):
         # get customer id from project key
         customer_id = project_key[2:]
         customer_email = issue["fields"].get("customfield_16262", "")
-        #customer_contact_no = issue["fields"].get("customfield_16263", "")
+        customer_contact_no = issue["fields"].get("customfield_16263", "")
         customer_contact = issue["fields"].get("customfield_16032", "")
         snow_case_no = issue["fields"].get("customfield_16266", "")
         subtask = issue["fields"]["issuetype"].get("subtask", "")
@@ -141,15 +140,19 @@ def jiradata_create_report(id):
             "issue_key": issue_key,
             "subtask": subtask,
             "parent_key":parent_key,
+            "customer_id":customer_id,
             "menu_card": menu_card,
             "capability": capability,
             "product": product,
+            "logo_url":"",
+            "logo_file_name":"",
+            "customer_name": project_name,
             "customer_name": project_name,  # customer name/proect name
             "snow_case_no": snow_case_no,
             "assignee_email":assignee_email,
             "customer_email": customer_email,
             "expert_name": assignee_name,  # expert name
-            "creator_name": creator_name,  # customer contact
+            "creator_name": creator_name,  # creator name
             "customer_contact": customer_contact  # customer contact
         }
         # get function for addition data
