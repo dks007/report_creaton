@@ -22,3 +22,4 @@ urlpatterns = [
     # path('menu-card-listing/', MenuViewSet.as_view({'get': 'list'}))
     # Add any additional URL patterns as needed
 ]
+

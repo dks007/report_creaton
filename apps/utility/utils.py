@@ -1,6 +1,6 @@
 from datetime import datetime
 from apps.dashboard.models import SuccessReport
-from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
+from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster, ReportStatusMaster
 from django.core.exceptions import ObjectDoesNotExist
 import re
 # common functions used by various apps
@@ -31,9 +31,51 @@ def convert_date(date_str):
 
     return formatted_date
 
+def get_productCapability(input_data):
+    """
+    Extracts product capability, product name, product version, and frequency from JSON data.
+
+    Args:
+    input_data (dict): Input JSON data.
+
+    Returns:
+    tuple: A tuple containing capability, product name, product version, and frequency.
+    """
+    CAPABILITY_KEY = "primary industry:"
+    PRODUCT_KEY = "product:"
+    FREQUENCY_KEY = "frequency:"
+
+    capability = None
+    product_name = None
+    product_version = None
+    frequency = None
+
+    content_items = input_data.get("content", [])
+    for content_item in content_items:
+        if content_item.get("type") == "paragraph":
+            text_items = [item.get("text", "") for item in content_item.get("content", [])]
+            for line in text_items:
+                line = line.strip()
+                if line.lower().startswith(CAPABILITY_KEY):
+                    capability = line.split(":")[1].strip()
+                elif line.lower().startswith(PRODUCT_KEY):
+                    product_line = line.split(":")[1].strip()
+                    product_parts = product_line.split()
+                    if any(part.replace('.', '', 1).isdigit() for part in product_parts):
+                        product_name_parts = product_parts[:-1] if "IFS Cloud" in product_line else product_parts
+                        product_name = " ".join(product_name_parts)
+                        product_version = next((part for part in product_parts if part.replace('.', '', 1).isdigit()), "NA")
+                    else:
+                        product_name = product_line
+                        product_version = "NA"
+                elif line.lower().startswith(FREQUENCY_KEY):
+                    frequency = line.split(":")[1].strip()
+
+    return capability, product_name, product_version, frequency
+
 
 # Function to extract product and capability
-def get_productCapability(json_data):
+def get_productCapability_old(json_data):
     #json_data = json.loads(json_data)
     capability = None
     product_version = None
@@ -127,6 +169,7 @@ def getSuccessReportData(issueKey):
         issue_data_dict['sub_capability_name'] = report_data.sub_capability.sub_capability_name.strip()
         issue_data_dict['customer_name'] = report_data.customer.customer_name.strip()
         issue_data_dict['customer_contact'] = report_data.customer_contact.customer_contact.strip()
+        issue_data_dict['logo'] = report_data.logo.logo_image
 
         return issue_data_dict
     
@@ -138,36 +181,53 @@ def getSuccessReportData(issueKey):
 # function to get sdm, csm, sdo , report status and error message 
 def getAdditionDataBKey(issue_data_dict):
     # Additional processing and enriching the issue_data_dict
+    
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-        desc = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('issue_key')).first()
+        menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('issue_key')).first()
+        sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
+        customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
+
         # check if records exists in success report table
         if report_data:
+    
             issue_data_dict['report_status'] = str(report_data.report_status.id)
             issue_data_dict['report_error'] = report_data.error_msg
-            issue_data_dict['sdo_name'] = str(report_data.sdo.sdo_name)
-            issue_data_dict['csm_name'] = str(report_data.csm.csm_name)
-            issue_data_dict['sdm_name'] = str(report_data.sdm.sdm_name)
-            issue_data_dict['menu_description'] = str(report_data.menu_card.menu_description)
-            issue_data_dict['menu_card'] = str(report_data.menu_card.menu_card)
-            issue_data_dict['customer_name'] = str(report_data.customer.customer_name)
-            issue_data_dict['snow_case_no'] = str(report_data.snow_case_no)
-            issue_data_dict['customer_contact'] = str(report_data.customer_contact.customer_contact)
-            issue_data_dict['product'] = str(report_data.product.product_name)
-            issue_data_dict['capability'] = str(report_data.capability.capability_name)
-            issue_data_dict['sub_capability'] = str(report_data.sub_capability.sub_capability_name)
-            #issue_data_dict['logo'] = str(report_data.logo.logo)
+
+            if report_data.sdo:
+                issue_data_dict['sdo_name'] = report_data.sdo.sdo_name
+            else:
+                issue_data_dict['sdo_name'] = ''
+
+            if report_data.csm:
+                issue_data_dict['csm_name'] = report_data.csm.csm_name
+            else:
+                issue_data_dict['csm_name'] = ''
+
+            if report_data.sdm:
+                issue_data_dict['sdm_name'] = report_data.sdm.sdm_name
+            else:
+                issue_data_dict['sdm_name'] = ''
+
+            issue_data_dict['menu_description'] = report_data.menu_card.menu_description
+            issue_data_dict['menu_card'] = report_data.menu_card.menu_card
+            issue_data_dict['customer_name'] = report_data.customer.customer_name
+            issue_data_dict['snow_case_no'] = report_data.snow_case_no
+            issue_data_dict['customer_contact'] = report_data.customer_contact.customer_contact
+            issue_data_dict['product'] = report_data.product.product_name
+            issue_data_dict['capability'] = report_data.capability.capability_name
+            issue_data_dict['sub_capability'] = report_data.sub_capability.sub_capability_name
+            issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
+            issue_data_dict['logo_url'] = report_data.logo.logo_url
         else:
-            # get sdm, sdo and csm to save in success report from jira
-            sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
-            customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
 
             if sdo_map:
                 issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
             else:
                 issue_data_dict['sdo_name']=''
 
-            if desc is not None:
-                issue_data_dict['menu_description'] = desc.menu_description if desc.menu_description else ''
+            if menu_card_data is not None:
+                issue_data_dict['menu_card'] = menu_card_data.menu_card if menu_card_data.menu_card else ''
+                issue_data_dict['menu_description'] = menu_card_data.menu_description if menu_card_data.menu_description else ''
 
             if customer_map:
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
@@ -182,7 +242,6 @@ def getAdditionDataBKey(issue_data_dict):
         return issue_data_dict
 
 # get issue description text
-
 def get_description_content(obj):
     if "content" in obj:
         content = obj["content"]
@@ -197,3 +256,20 @@ def get_description_content(obj):
                         text_content += "\n"
                 text_content += "\n"  # Add newline after each paragraph
         return text_content.strip()  # Remove leading/trailing whitespace
+
+# update report status
+def update_report_status(pk, report_status_id, download_link=None):
+    try:
+        success_report = SuccessReport.objects.get(pk=pk)
+        if download_link:
+            success_report.download_link = download_link
+        report_status_instance = ReportStatusMaster.objects.get(pk=report_status_id)
+        success_report.report_status = report_status_instance
+        success_report.save()
+        return True, f"SuccessReport with pk {pk} updated successfully."
+    except SuccessReport.DoesNotExist:
+        return False, f"SuccessReport with pk {pk} does not exist."
+    except ReportStatusMaster.DoesNotExist:
+        return False, f"ReportStatusMaster with id {report_status_id} does not exist."
+    except Exception as e:
+        return False, f"An error occurred: {str(e)}"

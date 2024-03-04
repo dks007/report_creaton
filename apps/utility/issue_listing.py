@@ -89,7 +89,6 @@ def issue_list_data(request):
                 "issue_summary": issue_summary,
                 "menu_card": menu_card,
                 "customer_id": customer_id,
-                "menu_description": menu_description,
                 "subtasks_list": subtasks_list,
                 "partner": partner,
                 "subtask": subtask,
@@ -111,20 +110,22 @@ def issue_list_data(request):
             customer_id = dt.get('customer_id')
             issue_key = dt.get('issue_key')
             
-            desc = MenuCardMaster.objects.filter(menu_card=menu_card_id, status=1).first()
+            menu_card_data = MenuCardMaster.objects.filter(menu_card=menu_card_id, status=1).first()
             report_data = SuccessReport.objects.filter(jira_key=issue_key, status=1).first()
             customer_map = CustomerMapping.objects.filter(customer__customer_id=customer_id, status=1).first()
             sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=menu_card_id, status=1, sdo__status=1).first()
-            print(customer_map)
             if sdo_map:
                 dt['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
+                
             if report_data:
                 dt['report_status'] = str(report_data.report_status.id)
                 dt['report_error'] = report_data.error_msg
+                dt['download_link'] = report_data.download_link
             else:
                 dt['report_status'] = '1'
-            if desc is not None:
-                dt['menu_description'] = desc.menu_description
+
+            if menu_card_data is not None:
+                dt['menu_description'] = menu_card_data.menu_description
             if customer_map:
                 dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''

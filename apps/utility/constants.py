@@ -36,10 +36,11 @@ FILE_SIZE = 5 * 1024 * 1024
 # article status
 REPORT_STATUS = (
     ('1', 'Not Created'),
-    ('2', 'Progress'),
-    ('3', 'Created'),
-    ('4', 'Saved'),
-    ('5', 'Error')
+    ('2', 'Initiated'),
+    ('3', 'In Progress'),
+    ('4', 'Created'),
+    ('5', 'Saved'),
+    ('6', 'Error')
 )
 """
 Define report status
