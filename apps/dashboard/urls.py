@@ -2,7 +2,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.dashboard.views import (get_issue_list, get_issue_details, MenuViewSet, ProjectViewSet, SubCapabilityViewSet,
-                                  CapabilityViewSet, SuccessCreateReportViewSet, SuccessReportViewSet, get_create_report)
+                                  CapabilityViewSet, SuccessCreateReportViewSet, SuccessReportViewSet,
+                                  get_create_report, ListViewSet)
 
 router = DefaultRouter()
 router.register('menu-card-list', MenuViewSet, basename='menu-card-list')
@@ -11,6 +12,7 @@ router.register('capability', CapabilityViewSet, basename='capability')
 router.register('sub-capability', SubCapabilityViewSet, basename='sub-capability')
 router.register('report', SuccessReportViewSet, basename='report')
 router.register('createreport', SuccessCreateReportViewSet, basename='createreport')
+router.register('list', ListViewSet, basename='list')
 # router.register('issue-list', IssueViewSet, basename='issue-list')
 
 urlpatterns = [

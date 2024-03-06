@@ -4,6 +4,7 @@
 
 # django import
 import json
+from rest_framework.decorators import action
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -21,6 +22,60 @@ from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, Capabi
                                            SDMMaster, SdoMaster, CSMMaster)
 from apps.dashboard.models.models import SuccessReport
 
+
+class ListViewSet(viewsets.GenericViewSet):
+
+    permission_classes = [IFSPermission]
+
+    @action(methods=['get'], detail=False, url_path='issue-list', url_name='issue-list')
+    def issue_list(self, request):
+        response, total_record = issue_list_data(request)
+        return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
+
+    @action(methods=['get'], detail=True, url_path='issue-details', url_name='issue-details')
+    def issue_details(self, request, *args, **kwargs):
+        response = issue_details_data(request, kwargs['pk'])
+        return Response({'resdata': response, 'status': status.HTTP_200_OK})
+
+    @action(methods=['get'], detail=True, url_path='get-create-report', url_name='get-create-report')
+    def get_create_report(self, request, *args, **kwargs):
+        try:
+            report = SuccessReport.objects.filter(jira_key=kwargs['pk']).first()
+            menu_card, product, capsubcap, customer_contact, customer = all_master_list()
+            if not report:
+                # Creating a new report
+                report_data = jiradata_create_report(request, kwargs['pk'])
+                report_data['menu_card_list'] = menu_card[0]
+                report_data['product_list'] = product[0]
+                report_data['capsubcap_list'] = capsubcap
+                report_data['customer_contact_list'] = customer_contact[0]
+                report_data['customer_list'] = customer[0]
+            else:
+                report_data = {
+                    "issue_key": report.jira_key,
+                    "menu_card": report.menu_card.menu_card if report.menu_card else "",
+                    "sdo_name": report.sdo.sdo_name if report.sdo else "",
+                    "csm_name": report.csm.csm_name if report.csm else "",
+                    "sdm_name": report.sdm.sdm_name if report.sdm else "",
+                    "capability": report.capability.capability_name if report.capability else "",
+                    "sub_capability": report.sub_capability.sub_capability_name if report.sub_capability else "",
+                    "product": report.product.product_name if report.product else "",
+                    "customer_name": report.customer.customer_name if report.customer else "",
+                    "snow_case_no": report.snow_case_no,
+                    "expert_name": report.expert.expert_name if report.expert else "",
+                    "customer_contact": report.customer_contact.customer_contact if report.customer_contact else "",
+                    "report_status": report.report_status.report_status_name if report.report_status else "",
+                    'menu_card_list': menu_card[0],
+                    'product_list': product[0],
+                    'capsubcap_list': capsubcap,
+                    'customer_list': customer[0],
+                    'customer_contact_list': customer_contact[0],
+                    'logo_file_name': report.logo.logo_file_name if report.logo else "",
+                    'logo_url': report.logo.logo_url if report.logo else ""
+                }
+            return JsonResponse({'resdata': report_data, 'status': status.HTTP_200_OK})
+        except Exception as e:
+            return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
 
 #@permission_required(IFSPermission)
 def get_issue_list(request):
