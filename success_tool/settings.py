@@ -135,7 +135,7 @@ MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 # Configure Django Rest Framework settings for authentication
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
     ],
 
 }
