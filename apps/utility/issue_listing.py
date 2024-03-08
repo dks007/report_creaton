@@ -18,13 +18,13 @@ def issue_list_data(request):
     url = os.getenv('JIRA_URL')
     response = requests.post(url, headers=headers, auth=auth, data=json.dumps(payload), verify=True)
     data_list = []
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
+    """ json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file) 
-    #if response.status_code == 200:
-    if True:
-        #issues_data = json.loads(response.text)
-        issues_data = data
+        data = json.load(json_file)  """
+    if response.status_code == 200:
+    #if True:
+        issues_data = json.loads(response.text)
+        #issues_data = data
         total_records = issues_data['total']
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
 

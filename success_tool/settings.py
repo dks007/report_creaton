@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'apps.accounts',
+    'django_extensions',
     'apps.dashboard'
 ]
 
@@ -133,13 +134,13 @@ MSAL_CLIENT_ID = 'your_client_id'
 MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 
 # Configure Django Rest Framework settings for authentication
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
     ],
 
 }
-
 # cors-configuration
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -202,11 +203,6 @@ SWAGGER_SETTINGS = {
 }
 
 
-# custom authentication backend
-AUTHENTICATION_CLASSES = [
-    'account.backends.AzureADAuthentication',
-]
-
 # CELERY SETUP
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
@@ -223,26 +219,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "handlers": {
-#         "file": {
-#             "level": "INFO",
-#             "class": "logging.FileHandler",
-#             "filename": "logs/django.log",
-#         },
-#     },
-#     "loggers": {
-#         "django": {
-#             "handlers": ["file"],
-#             "level": "INFO",
-#             "propagate": True,
-#         },
-#         "logging_app": {
-#             "handlers": ["file"],
-#             "level": "INFO",
-#             "propagate": True,
-#         },
-#     },
-# }
