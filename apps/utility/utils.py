@@ -183,7 +183,7 @@ def getAdditionDataBKey(issue_data_dict):
     # Additional processing and enriching the issue_data_dict
     
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
-        menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('issue_key')).first()
+        menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
         customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
 
@@ -232,9 +232,11 @@ def getAdditionDataBKey(issue_data_dict):
             if customer_map:
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+                issue_data_dict['customer_name'] = customer_map.customer.customer_name if customer_map.customer else ''
             else:
                 issue_data_dict['csm_name']=''
                 issue_data_dict['sdm_name']=''
+                issue_data_dict['customer_name'] =''
 
             issue_data_dict['report_status'] = '1'
             issue_data_dict['report_error'] = ''

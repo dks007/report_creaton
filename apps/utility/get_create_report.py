@@ -26,7 +26,7 @@ def jiradata_create_report(request, id):
         tuple: response data provide individual records of issue key.
     """
     # Construct payload using jqlpayload.py
-    payload = construct_payload(request,id=None)
+    payload = construct_payload(request,id)
     # Getting request
     #issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
