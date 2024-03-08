@@ -58,6 +58,7 @@ def get_productCapability(input_data):
                 line = line.strip()
                 if line.lower().startswith(CAPABILITY_KEY):
                     capability = line.split(":")[1].strip()
+                    capability = None if capability.lower() =="undefined" else capability
                 elif line.lower().startswith(PRODUCT_KEY):
                     product_line = line.split(":")[1].strip()
                     product_parts = product_line.split()
@@ -91,6 +92,7 @@ def get_productCapability_old(json_data):
 
                 if line.lower().startswith("primary industry:"):
                     capability = line.split(":")[1].strip()
+                    capability = None if capability.value.lower() =="undefined" else capability.value
 
                 if line.lower().startswith("product:"):
                     product_line = line.split(":")[1].strip()
@@ -181,7 +183,6 @@ def getSuccessReportData(issueKey):
 # function to get sdm, csm, sdo , report status and error message 
 def getAdditionDataBKey(issue_data_dict):
     # Additional processing and enriching the issue_data_dict
-    
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
         menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
@@ -189,7 +190,6 @@ def getAdditionDataBKey(issue_data_dict):
 
         # check if records exists in success report table
         if report_data:
-    
             issue_data_dict['report_status'] = str(report_data.report_status.id)
             issue_data_dict['report_error'] = report_data.error_msg
 
@@ -219,8 +219,7 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
             issue_data_dict['logo_url'] = report_data.logo.logo_url
         else:
-
-            if sdo_map:
+            if sdo_map and sdo_map.sdo:
                 issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
             else:
                 issue_data_dict['sdo_name']=''
@@ -232,11 +231,9 @@ def getAdditionDataBKey(issue_data_dict):
             if customer_map:
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
-                issue_data_dict['customer_name'] = customer_map.customer.customer_name if customer_map.customer else ''
             else:
                 issue_data_dict['csm_name']=''
                 issue_data_dict['sdm_name']=''
-                issue_data_dict['customer_name'] =''
 
             issue_data_dict['report_status'] = '1'
             issue_data_dict['report_error'] = ''

@@ -19,8 +19,11 @@ from django.db import transaction
 
 def success_report(data: dict, logo_id=None):
 
+    print("data--->",data)
+
     # Fetch the existing SuccessReport instance, if it exists
     success_report_instance = SuccessReport.objects.filter(jira_key=data.get('issue_key')).first()
+
 
     # If the report exists and its status is 2 or 3, return a message indicating that the report is in progress
     if success_report_instance and success_report_instance.report_status.id in [2, 3]:
@@ -36,6 +39,11 @@ def success_report(data: dict, logo_id=None):
     capability = CapabilityMaster.objects.filter(capability_name=data.get('capability')).first()
     sub_capability = SubCapabilityMaster.objects.filter(sub_capability_name=data.get('sub_capability')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
+
+    if not capability:
+        return "Please select capability !"
+
+
     expert, created = ExpertMaster.objects.get_or_create(
         expert_name=data.get('expert_name'),
         defaults={'expert_email': data.get('expert_email')}
