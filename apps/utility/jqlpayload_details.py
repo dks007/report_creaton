@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 # Construct payload for the Jira API request
-def construct_payload(request,id=None):
+def construct_payload(request,id):
     issueKey = id  # Filter by Issue Key
     payload = {
         "expand": ["changelog"],
