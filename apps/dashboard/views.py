@@ -26,26 +26,28 @@ from apps.dashboard.models.models import SuccessReport
 class ListViewSet(viewsets.GenericViewSet):
 
     permission_classes = [IFSPermission]
-    #email = request.auth.payload.get('unique_name')
-
-    @action(methods=['get'], detail=False, url_path='issue-list', url_name='issue-list')
+    #mail = request.auth.payload.get('email')
+    #print("email-->",email)
+    @action(methods=['get'], detail=False, url_path='issue-listing', url_name='issue-listing')
     def issue_list(self, request):
+        email = request.auth.payload.get('email')
+        print("email-->",email)
         response, total_record = issue_list_data(request)
         return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
 
-    @action(methods=['get'], detail=True, url_path='issue-details', url_name='issue-details')
-    def issue_details(self, request, *args, **kwargs):
-        response = issue_details_data(request, kwargs['pk'])
+    @action(methods=['get'], detail=False, url_path='issue-details/(?P<id>[^/.]+)', url_name='issue-details')
+    def issue_details(self, request, id=None):
+        response = issue_details_data(request, id)
         return Response({'resdata': response, 'status': status.HTTP_200_OK})
 
-    @action(methods=['get'], detail=True, url_path='get-create-report', url_name='get-create-report')
-    def get_create_report(self, request, *args, **kwargs):
+    @action(methods=['get'], detail=False, url_path='get-createreport/(?P<id>[^/.]+)', url_name='get-createreport')
+    def get_create_report(self, request, id):
         try:
-            report = SuccessReport.objects.filter(jira_key=kwargs['pk']).first()
+            report = SuccessReport.objects.filter(jira_key=id).first()
             menu_card, product, capsubcap, customer_contact, customer = all_master_list()
             if not report:
                 # Creating a new report
-                report_data = jiradata_create_report(request, kwargs['pk'])
+                report_data = jiradata_create_report(request, id)
                 report_data['menu_card_list'] = menu_card[0]
                 report_data['product_list'] = product[0]
                 report_data['capsubcap_list'] = capsubcap
@@ -78,14 +80,13 @@ class ListViewSet(viewsets.GenericViewSet):
         except Exception as e:
             return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
 
-
 class MenuViewSet(viewsets.ModelViewSet):
     """
     menu card view set, used to get menu list and specific record
     """
     queryset = MenuCardMaster.objects.all()
     serializer_class = MenuListSerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -110,7 +111,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectMaster.objects.all()
     serializer_class = ProjectSerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -127,7 +128,7 @@ class CapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = CapabilityMaster.objects.all()
     serializer_class = CapabilitySerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -146,7 +147,7 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = SubCapabilityMaster.objects.all()
     serializer_class = SubCapabilitySerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -173,7 +174,7 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
     """
     queryset = SuccessReport.objects.all()
     serializer_class = SuccessReportSerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -202,7 +203,7 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
 # create popup report
 class SuccessCreateReportViewSet(viewsets.GenericViewSet):
     serializer_class = SuccessCreateReportSerializer
-    #permission_classes = [IFSPermission]
+    permission_classes = [IFSPermission]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
