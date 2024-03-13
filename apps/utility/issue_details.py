@@ -15,6 +15,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 def issue_details_data(request,id):
+    print("issue_details_data--->",id)
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 
@@ -41,14 +42,15 @@ def issue_details_data(request,id):
         verify=False
     )
 
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
+    """ json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
+    # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file) 
-
-    #if response.status_code == 200:
-    if True:
-        #issues_data = json.loads(response.text)
-        issues_data = data
+ """
+    if response.status_code == 200:
+    #if True:
+        issues_data = json.loads(response.text)
+        #issues_data = data
         #call menu card from MenucardMaster database
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         issue = issues_data['issues'][0]  # Extracting the single issue

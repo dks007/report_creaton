@@ -187,6 +187,14 @@ def getAdditionDataBKey(issue_data_dict):
         menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
         customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
+        
+        # getting custimer logo if logo url not saved by expert
+        if report_data and report_data.logo_url:
+            logo_url = report_data.logo_url
+        elif customer_map and customer_map.logo:
+            logo_url = customer_map.logo.logo_url
+        else: 
+            logo_url=''
 
         # check if records exists in success report table
         if report_data:
@@ -207,6 +215,11 @@ def getAdditionDataBKey(issue_data_dict):
                 issue_data_dict['sdm_name'] = report_data.sdm.sdm_name
             else:
                 issue_data_dict['sdm_name'] = ''
+            
+            if report_data.psm:
+                issue_data_dict['psm_name'] = report_data.psm.psm_name
+            else:
+                issue_data_dict['psm_name'] = ''
 
             issue_data_dict['menu_description'] = report_data.menu_card.menu_description
             issue_data_dict['menu_card'] = report_data.menu_card.menu_card
@@ -217,7 +230,7 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['capability'] = report_data.capability.capability_name
             issue_data_dict['sub_capability'] = report_data.sub_capability.sub_capability_name
             issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
-            issue_data_dict['logo_url'] = report_data.logo.logo_url
+            issue_data_dict['logo_url'] = logo_url
         else:
             if sdo_map and sdo_map.sdo:
                 issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
@@ -231,6 +244,9 @@ def getAdditionDataBKey(issue_data_dict):
             if customer_map:
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+                issue_data_dict['customer_name'] = customer_map.customer.customer_name
+                issue_data_dict['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
+                issue_data_dict['logo_url'] = logo_url if logo_url else ''
             else:
                 issue_data_dict['csm_name']=''
                 issue_data_dict['sdm_name']=''

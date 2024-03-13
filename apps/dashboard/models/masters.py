@@ -13,7 +13,18 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+# logo master model
+class LogoMaster(models.Model):
+    logo_file_name = models.TextField()
+    logo_file_type = models.CharField(max_length=10, null=True, blank=True)
+    logo_file_size = models.IntegerField()
+    logo_url = models.TextField(null=True, blank=True)
+    logo = models.BinaryField(null=True, blank=True)
+    logo_image = models.ImageField(upload_to="client_images",null=True, blank=True)
 
+    def __str__(self):
+        return f"LogoMaster {self.id} - {self.logo_file_name}"
+        
 # Expert master
 class ExpertMaster(models.Model):
     expert_account_id = models.CharField(max_length=100, null=True, blank=True)
@@ -90,6 +101,7 @@ class CustomerMapping(BaseModel):
     csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
     psm = models.ForeignKey('PSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
     sdm = models.ForeignKey('SDMMaster', on_delete=models.SET_NULL, null=True, blank=True)
+    logo = models.ForeignKey(LogoMaster, on_delete=models.CASCADE, null=True, blank=True,related_name='customer_logo')
     industry = models.ForeignKey('IndustryMaster', on_delete=models.SET_NULL, null=True, blank=True)
     success_elements = models.ForeignKey('SuccessElementsMaster', on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -189,27 +201,6 @@ class CreatorMaster(BaseModel):
 
     def __str__(self):
         return f"CreatorMaster {self.id} - {self.creator_name}"
-
-
-""" # Logo Master   
-def get_upload_path(instance, filename):
-    base_directory = os.getenv('CLIENT_IMAGES', 'client_images/')
-    if not os.path.exists(base_directory):
-        os.makedirs(base_directory)
-    return os.path.join(base_directory, filename) """
-
-class LogoMaster(models.Model):
-    logo_file_name = models.TextField()
-    logo_file_type = models.CharField(max_length=10, null=True, blank=True)
-    logo_file_size = models.IntegerField()
-    logo_url = models.TextField(null=True, blank=True)
-    logo = models.BinaryField(null=True, blank=True)
-    logo_image = models.ImageField(upload_to="client_images",null=True, blank=True)
-
-    def __str__(self):
-        return f"LogoMaster {self.id} - {self.logo_file_name}"
-
-    
 
 
 # Report Status Master

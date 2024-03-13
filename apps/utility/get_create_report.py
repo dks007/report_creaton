@@ -42,14 +42,14 @@ def jiradata_create_report(request, id):
          verify=False
      )
 
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
+    """ json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file)
+        data = json.load(json_file) """
 
-    #if response.status_code == 200:
-    if True:
-        #issues_data = json.loads(response.text)
-        issues_data = data
+    if response.status_code == 200:
+    #f True:
+        issues_data = json.loads(response.text)
+        #issues_data = data
         # call menu card from MenucardMaster database
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
         issue = issues_data['issues'][0]  # Extracting the single issue
@@ -145,8 +145,7 @@ def jiradata_create_report(request, id):
             "product": product,
             "logo_url":"",
             "logo_file_name":"",
-            "customer_name": project_name,
-            "customer_name": project_name,  # customer name/proect name
+            "project_name": project_name, 
             "snow_case_no": snow_case_no,
             "assignee_email":assignee_email,
             "customer_email": customer_email,

@@ -17,9 +17,7 @@ from apps.utility.utils import update_report_status
 
 from django.db import transaction
 
-def success_report(data: dict, logo_id=None):
-
-    print("data--->",data)
+def success_report(data: dict):
 
     # Fetch the existing SuccessReport instance, if it exists
     success_report_instance = SuccessReport.objects.filter(jira_key=data.get('issue_key')).first()
@@ -31,14 +29,14 @@ def success_report(data: dict, logo_id=None):
     
     # If the report exists and its status is 4, return a message indicating that the report has already been created
     if success_report_instance and success_report_instance.report_status.id == 4:
-        return "Report has already been created."
-
-
+        return "Report has already been created." 
+    
     menu_card = MenuCardMaster.objects.filter(menu_card=data.get('menu_card')).first()
     product = ProductMaster.objects.filter(product_name=data.get('product')).first()
     capability = CapabilityMaster.objects.filter(capability_name=data.get('capability')).first()
     sub_capability = SubCapabilityMaster.objects.filter(sub_capability_name=data.get('sub_capability')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
+
 
     if not capability:
         return "Please select capability !"
@@ -60,15 +58,6 @@ def success_report(data: dict, logo_id=None):
     csm = CSMMaster.objects.filter(csm_name=data.get('csm_name')).first()
     sdo = SdoMaster.objects.filter(sdo_name=data.get('sdo_name')).first()
 
-    # Fetch the LogoMaster instance based on the provided logo_id
-    logo_instance = None
-    if logo_id is not None:
-        try:
-            logo_instance = LogoMaster.objects.get(pk=logo_id)
-        except LogoMaster.DoesNotExist:
-            # Handle the case where the logo with the provided ID does not exist
-            print("Logo with ID {} does not exist.".format(logo_id))
-
     # Determining report status based on action
     report_status_id = 5 if data.get('action') == 'saved' else 2
     report_status = ReportStatusMaster.objects.get(id=report_status_id)
@@ -88,10 +77,10 @@ def success_report(data: dict, logo_id=None):
             "expert": expert,
             "customer": customer,
             "customer_contact": customer_contact,
-            "logo": logo_instance,
             'sdm': sdm,
             'sdo': sdo,
-            'csm': csm
+            'csm': csm,
+            'logo_url': data.get('logo_url',''),
         }
     )
         msg ="Report saved successfully."
@@ -107,10 +96,10 @@ def success_report(data: dict, logo_id=None):
             success_report_instance.expert = expert
             success_report_instance.customer = customer
             success_report_instance.customer_contact = customer_contact
-            success_report_instance.logo = logo_instance
             success_report_instance.sdm = sdm
             success_report_instance.sdo = sdo
             success_report_instance.csm = csm
+            success_report_instance.logo_url = data.get('logo_url','')
             success_report_instance.save()
 
         # If action is 'created', update the report status and perform additional actions

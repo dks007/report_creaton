@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone  # Import the timezone module
 
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
-    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster, CustomerContactMaster, SdoMaster, CSMMaster, SDMMaster, ExCustomerContactsMaster, BaseModel
+    SubCapabilityMaster, LogoMaster, StatusMaster, CreatorMaster, ReportStatusMaster, CustomerContactMaster, SdoMaster, CSMMaster, SDMMaster, ExCustomerContactsMaster, BaseModel, PSMMaster
 
 
 class SuccessReport(models.Model):
@@ -22,12 +22,14 @@ class SuccessReport(models.Model):
     capability = models.ForeignKey(CapabilityMaster, on_delete=models.CASCADE)
     sub_capability = models.ForeignKey(SubCapabilityMaster, on_delete=models.CASCADE, null=True, blank=True)
     logo = models.ForeignKey(LogoMaster, on_delete=models.CASCADE, null=True, blank=True)
+    logo_url = models.TextField(null=True, blank=True)
     status = models.ForeignKey(StatusMaster, on_delete=models.CASCADE, default=1)
     error_msg = models.CharField(max_length=255, null=True, blank=True)
     download_link = models.TextField(null=True, blank=True)
     creator = models.ForeignKey(CreatorMaster, on_delete=models.SET_NULL, null=True, blank=True)
     sdm = models.ForeignKey(SDMMaster, on_delete=models.CASCADE, null=True, blank=True)
     csm = models.ForeignKey(CSMMaster, on_delete=models.CASCADE, null=True, blank=True)
+    psm = models.ForeignKey(PSMMaster, on_delete=models.CASCADE, null=True, blank=True)
     sdo = models.ForeignKey(SdoMaster, on_delete=models.CASCADE, null=True, blank=True)
     approved_by_sdo = models.CharField(max_length=10, null=True, blank=True)
     approved_sdo_date = models.DateField(null=True, blank=True)

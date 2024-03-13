@@ -137,6 +137,10 @@ MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 # Configure Django Rest Framework settings for authentication
 
 # Configure Django Rest Framework settings for authentication
+# Assuming environment variables are used to configure these settings
+CLIENT_ID = os.getenv('VITE_CLIENT_ID', '2bfabdcd-f00a-4f27-93e7-2986aa3dbe40')
+TENANT_ID = 'dilipku007gmail.onmicrosoft.com'
+
 """ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -151,26 +155,23 @@ REST_FRAMEWORK = {
     ],
 
 }
+# Configure SIMPLE_JWT as needed for your Azure AD integration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
 
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': 'OlQCPGuOGPnUrb4o2Hb1RfXkXXrx8aWiZglmr4k-544',
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-
+    'ALGORITHM': 'RS256',
+    'SIGNING_KEY': None,  # Signing key is not used for RS256 (asymmetric) algorithm
+    'VERIFYING_KEY': None,  # You must fetch the public key from Azure AD and set it here or in your token validation logic
+    'AUDIENCE': CLIENT_ID,
+    'ISSUER': f'https://login.microsoftonline.com/{TENANT_ID}/v2.0',
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-
+    'USER_ID_FIELD': 'sub',
+    'USER_ID_CLAIM': 'sub',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-    'JTI_CLAIM': 'jti',
 }
 # cors-configuration
 CORS_ORIGIN_ALLOW_ALL = True

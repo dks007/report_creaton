@@ -7,24 +7,25 @@ from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuC
 from datetime import datetime
 from apps.utility.utils import getSuccessReportData, getAdditionDataBKey, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
 from .jqlconfig import headers, auth
-from .jqlpayload import construct_payload
+from .jqlpayload import listing_construct_payload
 from .issue_bykey import issue_bykey
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 def issue_list_data(request):
-    payload = construct_payload(request)
+
+    payload = listing_construct_payload(request)
     url = os.getenv('JIRA_URL')
     response = requests.post(url, headers=headers, auth=auth, data=json.dumps(payload), verify=True)
     data_list = []
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
+    """ json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file) 
-    #if response.status_code == 200:
-    if True:
-        #issues_data = json.loads(response.text)
-        issues_data = data
+        data = json.load(json_file)  """
+    if response.status_code == 200:
+    #if True:
+        issues_data = json.loads(response.text)
+        #issues_data = data
         total_records = issues_data['total']
         menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
 
