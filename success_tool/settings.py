@@ -141,20 +141,20 @@ MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 CLIENT_ID = os.getenv('VITE_CLIENT_ID', '2bfabdcd-f00a-4f27-93e7-2986aa3dbe40')
 TENANT_ID = 'dilipku007gmail.onmicrosoft.com'
 
-""" REST_FRAMEWORK = {
+REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
 
-} """
+}
 
 
-REST_FRAMEWORK = {
+""" REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 
-}
+} """
 # Configure SIMPLE_JWT as needed for your Azure AD integration
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),

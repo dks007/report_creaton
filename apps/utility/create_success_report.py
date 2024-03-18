@@ -1,8 +1,7 @@
 """
-
+Success report save update data
 """
 import json, re, os
-
 from django.contrib.auth.models import User
 from django.core.serializers import serialize
 from django.core.exceptions import ValidationError
@@ -10,18 +9,15 @@ from django.core.files.storage import FileSystemStorage
 from django.db import IntegrityError
 from apps.dashboard.models import MenuCardMaster, CustomerMaster, ExpertMaster, ProductMaster, CapabilityMaster, \
     SubCapabilityMaster, CustomerContactMaster, StatusMaster, CreatorMaster, ReportStatusMaster, SuccessReport, \
-    ProjectMaster, LogoMaster, SDMMaster, CSMMaster, SdoMaster
-from apps.utility.create_upload_file import create_folder_and_upload_to_sharepoint
+    ProjectMaster, LogoMaster, SDMMaster, CSMMaster, SdoMaster, CustomerMapping
 
 from apps.utility.utils import update_report_status
-
 from django.db import transaction
+from django.db.models import F
 
 def success_report(data: dict):
-
     # Fetch the existing SuccessReport instance, if it exists
     success_report_instance = SuccessReport.objects.filter(jira_key=data.get('issue_key')).first()
-
 
     # If the report exists and its status is 2 or 3, return a message indicating that the report is in progress
     if success_report_instance and success_report_instance.report_status.id in [2, 3]:
@@ -37,10 +33,8 @@ def success_report(data: dict):
     sub_capability = SubCapabilityMaster.objects.filter(sub_capability_name=data.get('sub_capability')).first()
     customer = CustomerMaster.objects.filter(customer_name=data.get('customer_name')).first()
 
-
     if not capability:
         return "Please select capability !"
-
 
     expert, created = ExpertMaster.objects.get_or_create(
         expert_name=data.get('expert_name'),
@@ -57,10 +51,43 @@ def success_report(data: dict):
     sdm = SDMMaster.objects.filter(sdm_name=data.get('sdm_name')).first()
     csm = CSMMaster.objects.filter(csm_name=data.get('csm_name')).first()
     sdo = SdoMaster.objects.filter(sdo_name=data.get('sdo_name')).first()
+    customer_map = CustomerMapping.objects.filter(customer=customer).first()
 
     # Determining report status based on action
     report_status_id = 5 if data.get('action') == 'saved' else 2
     report_status = ReportStatusMaster.objects.get(id=report_status_id)
+
+    # Retrieve CustomerMapping and then LogoMaster for the current customer
+    logo_url = data.get('logo_url','')
+    existing_logo_url=""
+
+    # Check if customer_map is not None and has a logo attribute
+    if customer_map is not None and hasattr(customer_map, 'logo'):
+        # Now check if customer_map.logo is not None before accessing logo_url
+        if customer_map.logo is not None:
+            existing_logo_url = customer_map.logo.logo_url
+        else:
+            # Handle the case where customer_map.logo is None
+            existing_logo_url = None  # Explicitly set to None or keep as an empty string, as per your logic
+    else:
+        # Handle the case where customer_map is None or does not have a logo attribute
+        existing_logo_url = None  # Explicitly set to None or keep as an empty string, as per your logic
+
+
+    # check if logo master and reuested logo url not available
+    if not logo_url and not existing_logo_url =="":
+       return "Please enter logo url"  
+
+    # Check if the incoming logo_url is different from the existing logo_url in LogoMaster
+    if logo_url and logo_url != existing_logo_url:
+        logo_url = logo_url
+    else:
+        logo_url =""
+
+    #getting logo id for save according to customer selection
+    logo=None
+    if customer_map and customer_map.logo:
+        logo = customer_map.logo
 
     # Handling transaction for atomicity
     with transaction.atomic():
@@ -80,12 +107,13 @@ def success_report(data: dict):
             'sdm': sdm,
             'sdo': sdo,
             'csm': csm,
-            'logo_url': data.get('logo_url',''),
+            'logo': logo,
+            'logo_url':logo_url,
         }
     )
         msg ="Report saved successfully."
 
-        # If SuccessReport was not newly created, update the data
+        # SuccessReport update the data
         if not created_success_report and success_report_instance.report_status.id not in [2, 3]:
             success_report_instance.menu_card = menu_card
             success_report_instance.product = product
@@ -99,7 +127,8 @@ def success_report(data: dict):
             success_report_instance.sdm = sdm
             success_report_instance.sdo = sdo
             success_report_instance.csm = csm
-            success_report_instance.logo_url = data.get('logo_url','')
+            success_report_instance.logo = logo
+            success_report_instance.logo_url = logo_url
             success_report_instance.save()
 
         # If action is 'created', update the report status and perform additional actions
@@ -136,7 +165,13 @@ def all_master_list():
     menu_card = MenuCardMaster.objects.values('id', 'menu_card')
     product = ProductMaster.objects.values('id', 'product_name')
     customer_contact = CustomerContactMaster.objects.values('id', 'customer_contact')
-    customer = CustomerMaster.objects.values('id', 'customer_name')
+    #customer = CustomerMaster.objects.values('id', 'customer_name')
+
+    # Assuming an indirect relation through CustomerMapping
+    customer = CustomerMaster.objects.annotate(
+        logo_url=F('customermapping__logo__logo_url')
+    ).values('id', 'customer_name', 'logo_url')
+
     cap_subcap = cap_subcap_array()
 
     list_menu_card = list(menu_card),
@@ -147,10 +182,10 @@ def all_master_list():
 
     return list_menu_card, list_product, list_cap_subcap, list_customer_contact, list_customer
 
-file_storage = FileSystemStorage(location=os.getenv('CLIENT_IMAGES', 'client_images/'))
 
 #Saving logo data
 def upload_logo_image(logo_file, customer_name):
+    file_storage = FileSystemStorage(location=os.getenv('CLIENT_IMAGES', 'client_images/'))
     try:
         customer = CustomerMaster.objects.filter(customer_name=customer_name).first()
         # Check if file size exceeds 500KB

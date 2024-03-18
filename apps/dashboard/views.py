@@ -4,6 +4,7 @@
 
 # django import
 import json
+from rest_framework.decorators import action
 from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -16,69 +17,44 @@ from ..accounts.permissions import IFSPermission
 from ..utility.create_success_report import success_report, convert_json, all_master_list, upload_logo_image
 from ..utility.get_create_report import jiradata_create_report
 from ..utility.issue_listing import issue_list_data
+
+from ..utility.subtask_listing import subtask_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
                                            SDMMaster, SdoMaster, CSMMaster)
 from apps.dashboard.models.models import SuccessReport
 
 
-#@permission_required(IFSPermission)
-def get_issue_list(request):
-    """
-    used to fetch all issues
-    """
-    if request.method == 'GET':
+class ListViewSet(viewsets.GenericViewSet):
+
+    #permission_classes = [IFSPermission]
+    #mail = request.auth.payload.get('email')
+    #print("email-->",email)
+    @action(methods=['get'], detail=False, url_path='issue-listing', url_name='issue-listing')
+    def issue_list(self, request):
+        #email = request.auth.payload.get('email')
+        #print("email-->",email)
         response, total_record = issue_list_data(request)
-        return JsonResponse({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
-    else:
-        return JsonResponse({'error': 'something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
-
-
-#@permission_required(IFSPermission)
-def get_issue_details(request, id):
-    print("get_issue_details--->",id)
-    """
-    Fetches details of a specific issue.
-
-    Parameters:
-    - request: The HTTP request object.
-    - id: The ID of the issue to fetch.
-
-    Returns:
-    - JsonResponse: A JSON response containing issue details or an error message.
-    """
-    if request.method == 'GET':
-        try:
-            response = issue_details_data(request, id)
-            return JsonResponse({'resdata': response, 'status': status.HTTP_200_OK})
-        except id.DoesNotExist:
-            return JsonResponse({'error': 'Issue not found', 'status': status.HTTP_404_NOT_FOUND})
-        except Exception as e:
-            return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
-    else:
-        return JsonResponse({'error': 'Method not allowed', 'status': status.HTTP_405_METHOD_NOT_ALLOWED})
-
-
-
-# getting first if data already saved in database 2nd get from jira
-#@permission_required(IFSPermission)
-def get_create_report(request, id):
-    """
-    Fetches an existing report or creates a new one if not found.
+        return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
     
-    Parameters:
-        request (HttpRequest): The request object.
-        jira_key (str): The Jira key for the report.
-        
-    Returns:
-        JsonResponse: A JSON response with the report data or an error message.
-    """
-    if request.method == 'GET':
-        try:
-            # Checking if report already exists in the table
-            report = SuccessReport.objects.filter(jira_key=id).first()
-            menu_card, product, capsubcap, customer_contact, customer = all_master_list()
+    @action(methods=['get'], detail=False, url_path='subtask-listing/(?P<id>[^/.]+)', url_name='subtask-listing')
+    def subtask_listing(self, request,id):
 
+        response, total_record = subtask_list_data(request,id)
+        return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
+
+    @action(methods=['get'], detail=False, url_path='issue-details/(?P<id>[^/.]+)', url_name='issue-details')
+    def issue_details(self, request, id):
+        response = issue_details_data(request, id)
+        return Response({'resdata': response, 'status': status.HTTP_200_OK})
+
+    @action(methods=['get'], detail=False, url_path='get-createreport/(?P<id>[^/.]+)', url_name='get-createreport')
+    def get_create_report(self, request, id):
+        try:
+            print("view iddddd->",id)
+            report = SuccessReport.objects.filter(jira_key=id).first()
+            print("view report->",report)
+            menu_card, product, capsubcap, customer_contact, customer = all_master_list()
             if not report:
                 # Creating a new report
                 report_data = jiradata_create_report(request, id)
@@ -88,7 +64,7 @@ def get_create_report(request, id):
                 report_data['customer_contact_list'] = customer_contact[0]
                 report_data['customer_list'] = customer[0]
             else:
-                
+                print("view else from db -->")
                 report_data = {
                     "issue_key": report.jira_key,
                     "menu_card": report.menu_card.menu_card if report.menu_card else "",
@@ -108,13 +84,12 @@ def get_create_report(request, id):
                     'capsubcap_list': capsubcap,
                     'customer_list': customer[0],
                     'customer_contact_list': customer_contact[0],
-                    'logo_url': logo_url if logo_url else ""
+                    'logo_file_name': report.logo.logo_file_name if report.logo else "",
+                    'logo_url': report.logo.logo_url if report.logo else ""
                 }
             return JsonResponse({'resdata': report_data, 'status': status.HTTP_200_OK})
         except Exception as e:
             return JsonResponse({'error': str(e), 'status': status.HTTP_500_INTERNAL_SERVER_ERROR})
-    else:
-        return JsonResponse({'error': 'Method not allowed', 'status': status.HTTP_405_METHOD_NOT_ALLOWED})
 
 class MenuViewSet(viewsets.ModelViewSet):
     """
@@ -202,10 +177,6 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response({'message': 'SubCapability created successfully', 'status': status.HTTP_201_CREATED})
         return Response({'message': 'Something went wrong', 'status': status.HTTP_400_BAD_REQUEST})
-
-
-class IssueViewSet(viewsets.ModelViewSet):
-    pass
 
 
 class SuccessReportViewSet(viewsets.ModelViewSet):

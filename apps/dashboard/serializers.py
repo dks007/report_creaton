@@ -139,5 +139,5 @@ class SuccessCreateReportSerializer(serializers.Serializer):
     customer_contact = serializers.CharField(max_length=100, required=False)
     action = serializers.CharField(max_length=20, required=True)
     # New field for logo file upload
-    #logo = serializers.ImageField(required=False)
-    #logo_url = serializers.CharField(max_length=100,required=False)
+    logo = serializers.CharField(max_length=100,required=False)
+    logo_url = serializers.CharField(required=False, allow_blank=True, max_length=None)

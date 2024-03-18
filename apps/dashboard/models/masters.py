@@ -13,11 +13,11 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-# logo master model
+#logo master model
 class LogoMaster(models.Model):
     logo_file_name = models.TextField()
     logo_file_type = models.CharField(max_length=10, null=True, blank=True)
-    logo_file_size = models.IntegerField()
+    logo_file_size = models.IntegerField(null=True, blank=True)
     logo_url = models.TextField(null=True, blank=True)
     logo = models.BinaryField(null=True, blank=True)
     logo_image = models.ImageField(upload_to="client_images",null=True, blank=True)
@@ -91,7 +91,7 @@ class ProjectMaster(BaseModel):
         return f"{self.project_name}"
 
 
-# Customer mapping
+#Customer mapping
 class CustomerMapping(BaseModel):
     customer = models.ForeignKey(CustomerMaster, on_delete=models.CASCADE)
     region = models.ForeignKey(RegionMaster, on_delete=models.CASCADE, null=True, blank=True)
@@ -101,7 +101,7 @@ class CustomerMapping(BaseModel):
     csm = models.ForeignKey('CSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
     psm = models.ForeignKey('PSMMaster', on_delete=models.SET_NULL, null=True, blank=True)
     sdm = models.ForeignKey('SDMMaster', on_delete=models.SET_NULL, null=True, blank=True)
-    logo = models.ForeignKey(LogoMaster, on_delete=models.CASCADE, null=True, blank=True,related_name='customer_logo')
+    logo = models.ForeignKey(LogoMaster, on_delete=models.CASCADE, null=True, blank=True)
     industry = models.ForeignKey('IndustryMaster', on_delete=models.SET_NULL, null=True, blank=True)
     success_elements = models.ForeignKey('SuccessElementsMaster', on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
