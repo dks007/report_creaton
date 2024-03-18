@@ -1,6 +1,6 @@
 from datetime import datetime
 from apps.dashboard.models import SuccessReport
-from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster, ReportStatusMaster
+from apps.dashboard.models.masters import LogoMaster, CustomerMapping, MenuSdoMapping, MenuCardMaster, ReportStatusMaster
 from django.core.exceptions import ObjectDoesNotExist
 import re
 # common functions used by various apps
@@ -182,14 +182,24 @@ def getSuccessReportData(issueKey):
 
 # function to get sdm, csm, sdo , report status and error message 
 def getAdditionDataBKey(issue_data_dict):
-    # Additional processing and enriching the issue_data_dict
+        # Additional processing and enriching the issue_data_dict
+        print("issue_keyissue_key-->",issue_data_dict.get('issue_key'))
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
         menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
         customer_map = CustomerMapping.objects.filter(customer__customer_id=issue_data_dict.get('customer_id')).first()
-
+        
+        logo_url = ""  # Initialize logo_url
         # check if records exists in success report table
         if report_data:
+            
+            # Check if report_data has a direct logo_url attribute and it's not None/empty
+            if hasattr(report_data, 'logo_url') and report_data.logo_url:
+                logo_url = report_data.logo_url
+            # If not, check if report_data has a logo object with a logo_url attribute
+            elif hasattr(report_data, 'logo') and report_data.logo and hasattr(report_data.logo, 'logo_url') and report_data.logo.logo_url:
+                logo_url = report_data.logo.logo_url
+
             issue_data_dict['report_status'] = str(report_data.report_status.id)
             issue_data_dict['report_error'] = report_data.error_msg
 
@@ -207,6 +217,11 @@ def getAdditionDataBKey(issue_data_dict):
                 issue_data_dict['sdm_name'] = report_data.sdm.sdm_name
             else:
                 issue_data_dict['sdm_name'] = ''
+            
+            if report_data.psm:
+                issue_data_dict['psm_name'] = report_data.psm.psm_name
+            else:
+                issue_data_dict['psm_name'] = ''
 
             issue_data_dict['menu_description'] = report_data.menu_card.menu_description
             issue_data_dict['menu_card'] = report_data.menu_card.menu_card
@@ -216,8 +231,8 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['product'] = report_data.product.product_name
             issue_data_dict['capability'] = report_data.capability.capability_name
             issue_data_dict['sub_capability'] = report_data.sub_capability.sub_capability_name
-            issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
-            issue_data_dict['logo_url'] = report_data.logo.logo_url
+            #issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
+            issue_data_dict['logo_url'] = logo_url
         else:
             if sdo_map and sdo_map.sdo:
                 issue_data_dict['sdo_name'] = sdo_map.sdo.sdo_name if sdo_map.sdo else ''
@@ -229,8 +244,14 @@ def getAdditionDataBKey(issue_data_dict):
                 issue_data_dict['menu_description'] = menu_card_data.menu_description if menu_card_data.menu_description else ''
 
             if customer_map:
+                if customer_map and customer_map.logo:
+                    logo_url = customer_map.logo.logo_url
+                    
                 issue_data_dict['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 issue_data_dict['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
+                issue_data_dict['customer_name'] = customer_map.customer.customer_name
+                issue_data_dict['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
+                issue_data_dict['logo_url'] = logo_url if logo_url else ''
             else:
                 issue_data_dict['csm_name']=''
                 issue_data_dict['sdm_name']=''

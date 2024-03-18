@@ -3,18 +3,14 @@ import os
 from datetime import datetime
 
 # Construct payload for the Jira API request
-def listing_construct_payload(request):
+def subtask_construct_payload(request,parent_key):
     
     startAt = int(request.GET.get('start', 0))  # Default value: 0
-    maxResults = int(request.GET.get('max_result', 20))  # Default value: 20
-    filterByCreatedDate = request.GET.get('filterByCreatedDate', False)  # Default value: False
-    startDate = request.GET.get('startDate')
-    endDate = request.GET.get('endDate')
+    maxResults = int(request.GET.get('max_result', 25))  # Default value: 20
     sortBy = request.GET.get('sortBy', 'created')  # Default value: 'created'
     order = request.GET.get('order', 'DESC')  # Default value: 'DESC'
-    #issuetype = request.GET.get('issuetype', 'Tasks')  # Default value: 'Sub-task, Task'
-    #issuetype = request.GET.get('issuetype', 'Sub-task, Tasks')  # Default value: 'Sub-task, Task'
-    issuekey = request.GET.get('issuekey', '')  # Filter by Issue Key
+    issuetype = request.GET.get('issuetype', 'Sub-task')  # Default value: 'Sub-task, Task'
+    #issuekey = request.GET.get('issuekey', '')  # Filter by Issue Key
     status = request.GET.get('status', "('Awaiting Customer', 'In Process', 'In Review', 'Not Started')")  # Default value for status
     parent_key = request.GET.get('parent_key', '')  # Filter by parent Key
     activity_key_field = request.GET.get('activity_shname', 'True') # for activity short name customfield_16036
@@ -23,22 +19,9 @@ def listing_construct_payload(request):
 
     if parent_key:
         jql_parts.append(f"parent in ({parent_key})")
-        issuetype = request.GET.get('issuetype', 'Sub-task, Tasks')
-
-    else:
-        issuetype = request.GET.get('issuetype', 'Tasks')
 
     if issuetype:
         jql_parts.append(f"issuetype in ({issuetype})")
-
-
-    if issuekey:
-        jql_parts.append(f"key in ({issuekey})")
-
-    if filterByCreatedDate == 'True' and startDate and endDate:
-        start_date_str = datetime.strptime(startDate, "%Y-%m-%d").strftime("%Y-%m-%d")
-        end_date_str = datetime.strptime(endDate, "%Y-%m-%d").strftime("%Y-%m-%d")
-        jql_parts.append(f"created >= '{start_date_str}' AND created <= '{end_date_str}'")
 
     if status:
         jql_parts.append(f"status in {status}")
@@ -68,7 +51,5 @@ def listing_construct_payload(request):
         "maxResults": maxResults,
         "startAt": startAt
     }
-
-    print("payload--->",payload)
 
     return payload

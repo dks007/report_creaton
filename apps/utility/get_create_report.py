@@ -28,7 +28,6 @@ def jiradata_create_report(request, id):
     # Construct payload using jqlpayload.py
     payload = construct_payload(request,id)
     # Getting request
-    #issue_key = request.GET.get('issue_key')
     emailId = "dilip.kumar.shrivastwa@ifs.com"
 
     url = os.getenv('JIRA_URL')
@@ -145,8 +144,7 @@ def jiradata_create_report(request, id):
             "product": product,
             "logo_url":"",
             "logo_file_name":"",
-            "customer_name": project_name,
-            "customer_name": project_name,  # customer name/proect name
+            "project_name": project_name, 
             "snow_case_no": snow_case_no,
             "assignee_email":assignee_email,
             "customer_email": customer_email,

@@ -5,21 +5,21 @@ import django
 from apps.dashboard.models import SuccessReport
 from apps.dashboard.models.masters import CustomerMapping, MenuSdoMapping, MenuCardMaster
 from datetime import datetime
-from apps.utility.utils import getSuccessReportData, getAdditionDataBKey, convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
+from apps.utility.utils import  convert_date, extract_subtasks_data , get_productCapability, find_menuid_in_string
 from .jqlconfig import headers, auth
-from .jqlpayload import listing_construct_payload
+from .jqlpayload_subtask import subtask_construct_payload
 from .issue_bykey import issue_bykey
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
-def issue_list_data(request):
+def subtask_list_data(request,parent_key):
 
-    payload = listing_construct_payload(request)
+    payload = subtask_construct_payload(request,parent_key)
     url = os.getenv('JIRA_URL')
     response = requests.post(url, headers=headers, auth=auth, data=json.dumps(payload), verify=True)
     data_list = []
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap.json"
+    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap_subtask.json"
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file) 
     #if response.status_code == 200:
@@ -52,6 +52,7 @@ def issue_list_data(request):
             issue_id = issue.get("id", "")
             issue_key = issue.get("key", "")
             created = issue["fields"].get('created', "")
+            jira_status = issue["fields"]["status"].get("name", "") if "status" in issue["fields"] else None
             created = convert_date(created)
             parent_id = issue["fields"]["parent"].get("id", "") if "parent" in issue["fields"] else None
             parent_key = issue["fields"]["parent"].get("key", "") if "parent" in issue["fields"] else None
@@ -101,7 +102,8 @@ def issue_list_data(request):
                 "assign_date": changelog_assignee_created if changelog_assignee_created else None,
                 "parent_id": parent_id,
                 "parent_key": parent_key,
-                "assignee_name": assignee_name
+                "assignee_name": assignee_name,
+                "jira_status": jira_status
             }
 
             data_list.append(issue_fields)

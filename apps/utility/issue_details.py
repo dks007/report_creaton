@@ -15,6 +15,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 def issue_details_data(request,id):
+  
     """
     Fetches issue data from Jira API and populates a Django model with the extracted data.
 
@@ -42,6 +43,7 @@ def issue_details_data(request,id):
     )
 
     json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
+    # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file) 
 

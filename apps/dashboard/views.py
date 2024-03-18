@@ -17,6 +17,8 @@ from ..accounts.permissions import IFSPermission
 from ..utility.create_success_report import success_report, convert_json, all_master_list, upload_logo_image
 from ..utility.get_create_report import jiradata_create_report
 from ..utility.issue_listing import issue_list_data
+
+from ..utility.subtask_listing import subtask_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
                                            SDMMaster, SdoMaster, CSMMaster)
@@ -25,25 +27,33 @@ from apps.dashboard.models.models import SuccessReport
 
 class ListViewSet(viewsets.GenericViewSet):
 
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
     #mail = request.auth.payload.get('email')
     #print("email-->",email)
     @action(methods=['get'], detail=False, url_path='issue-listing', url_name='issue-listing')
     def issue_list(self, request):
-        email = request.auth.payload.get('email')
-        print("email-->",email)
+        #email = request.auth.payload.get('email')
+        #print("email-->",email)
         response, total_record = issue_list_data(request)
+        return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
+    
+    @action(methods=['get'], detail=False, url_path='subtask-listing/(?P<id>[^/.]+)', url_name='subtask-listing')
+    def subtask_listing(self, request,id):
+
+        response, total_record = subtask_list_data(request,id)
         return Response({'resdata': response, 'total_record': total_record, 'status': status.HTTP_200_OK})
 
     @action(methods=['get'], detail=False, url_path='issue-details/(?P<id>[^/.]+)', url_name='issue-details')
-    def issue_details(self, request, id=None):
+    def issue_details(self, request, id):
         response = issue_details_data(request, id)
         return Response({'resdata': response, 'status': status.HTTP_200_OK})
 
     @action(methods=['get'], detail=False, url_path='get-createreport/(?P<id>[^/.]+)', url_name='get-createreport')
     def get_create_report(self, request, id):
         try:
+            print("view iddddd->",id)
             report = SuccessReport.objects.filter(jira_key=id).first()
+            print("view report->",report)
             menu_card, product, capsubcap, customer_contact, customer = all_master_list()
             if not report:
                 # Creating a new report
@@ -54,6 +64,7 @@ class ListViewSet(viewsets.GenericViewSet):
                 report_data['customer_contact_list'] = customer_contact[0]
                 report_data['customer_list'] = customer[0]
             else:
+                print("view else from db -->")
                 report_data = {
                     "issue_key": report.jira_key,
                     "menu_card": report.menu_card.menu_card if report.menu_card else "",
@@ -86,7 +97,7 @@ class MenuViewSet(viewsets.ModelViewSet):
     """
     queryset = MenuCardMaster.objects.all()
     serializer_class = MenuListSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -111,7 +122,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectMaster.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -128,7 +139,7 @@ class CapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = CapabilityMaster.objects.all()
     serializer_class = CapabilitySerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -147,7 +158,7 @@ class SubCapabilityViewSet(viewsets.ModelViewSet):
     """
     queryset = SubCapabilityMaster.objects.all()
     serializer_class = SubCapabilitySerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):
         """
@@ -174,7 +185,7 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
     """
     queryset = SuccessReport.objects.all()
     serializer_class = SuccessReportSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def create(self, request, *args, **kwargs):
         """
@@ -203,21 +214,13 @@ class SuccessReportViewSet(viewsets.ModelViewSet):
 # create popup report
 class SuccessCreateReportViewSet(viewsets.GenericViewSet):
     serializer_class = SuccessCreateReportSerializer
-    permission_classes = [IFSPermission]
+    #permission_classes = [IFSPermission]
 
     def create(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # Upload logo image if provided
-            logo_id = None
-            if 'logo' in request.FILES:
-                logo_id, error_msg = upload_logo_image(request.FILES['logo'],request.data.get('customer_name', ''))
-                if logo_id:
-                    # Save success report with logo id
-                    msg = success_report(serializer.validated_data, logo_id)
-                    return Response({'msg': msg, 'status': status.HTTP_201_CREATED})
-                else:
-                    return Response({'msg': error_msg, 'status': status.HTTP_404_NOT_FOUND})
-            else:
-                return Response({'msg': "Logo is required !", 'status': status.HTTP_404_NOT_FOUND})
-        return Response({'msg': serializer.errors, 'status': status.HTTP_404_NOT_FOUND})
+            msg = success_report(serializer.validated_data)
+            return Response({'msg': msg, 'status': status.HTTP_201_CREATED})
+        else:
+                
+            return Response({'msg': serializer.errors, 'status': status.HTTP_404_NOT_FOUND})
