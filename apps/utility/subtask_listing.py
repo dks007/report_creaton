@@ -14,20 +14,19 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 def subtask_list_data(request,parent_key):
-
     payload = subtask_construct_payload(request,parent_key)
     url = os.getenv('JIRA_URL')
     response = requests.post(url, headers=headers, auth=auth, data=json.dumps(payload), verify=True)
     data_list = []
-    json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap_subtask.json"
+    """ json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/findproductcap_subtask.json"
     with open(json_file_path, "r", encoding='utf-8') as json_file:
-        data = json.load(json_file) 
-    #if response.status_code == 200:
-    if True:
-        #issues_data = json.loads(response.text)
-        issues_data = data
+        data = json.load(json_file)  """
+    if response.status_code == 200:
+    #if True:
+        issues_data = json.loads(response.text)
+        #issues_data = data
         total_records = issues_data['total']
-        menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
+        #menuList = list(MenuCardMaster.objects.values_list('menu_card', flat=True))
 
         for issue in issues_data['issues']:
             menu_card = None
@@ -59,7 +58,7 @@ def subtask_list_data(request,parent_key):
             parent_summary = issue["fields"]["parent"]["fields"].get('summary', "") if "parent" in issue["fields"] else None
 
             activity_short_name = issue["fields"].get("customfield_16036", "")
-            if activity_short_name and '.' in activity_short_name:
+            """ if activity_short_name and '.' in activity_short_name:
                 activity_split_string = activity_short_name.split('.')
                 activit_project_id = activity_split_string[0]
                 activit_menu_string = activity_split_string[2]
@@ -76,7 +75,7 @@ def subtask_list_data(request,parent_key):
                 if parent_activity_string:
                     parent_activity_name = parent_activity_string.split('.')
                     parent_activit_id = parent_activity_name[0]
-                    menu_card, partner = find_menuid_in_string(parent_activit_id, menuList)
+                    menu_card, partner = find_menuid_in_string(parent_activit_id, menuList) """
 
             changelog_assignee_created = convert_date(changelog_assignee_created)
             project_id = issue["fields"]["project"].get("id", "")
@@ -84,14 +83,17 @@ def subtask_list_data(request,parent_key):
             project_key = issue["fields"]["project"].get("key", "")
             customer_id = project_key[2:]
             subtask = issue["fields"]["issuetype"].get("subtask", "")
-            assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue["fields"] else None
-            
+            if issue["fields"]["assignee"]:
+                assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue["fields"] else None
+            else:
+                assignee_name =""
+                
             issue_fields = {
                 "issue_key": issue_key,
                 "issue_summary": issue_summary,
-                "menu_card": menu_card,
+                #"menu_card": menu_card,
                 "customer_id": customer_id,
-                "subtasks_list": subtasks_list,
+                #"subtasks_list": subtasks_list,
                 "partner": partner,
                 "subtask": subtask,
                 "project_id": project_id,
@@ -108,7 +110,7 @@ def subtask_list_data(request,parent_key):
 
             data_list.append(issue_fields)
 
-        for dt in data_list:
+        """ for dt in data_list:
             menu_card_id = dt.get('menu_card')
             customer_id = dt.get('customer_id')
             issue_key = dt.get('issue_key')
@@ -132,7 +134,7 @@ def subtask_list_data(request,parent_key):
             if customer_map:
                 dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
-                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
+                dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else '' """
 
         return data_list, total_records
     else:

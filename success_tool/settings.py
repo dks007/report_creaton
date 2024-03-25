@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
-from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,7 +46,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'apps.accounts',
     'django_extensions',
-    'apps.dashboard'
+    'apps.dashboard',
+    'success_tool'
 ]
 
 MIDDLEWARE = [
@@ -135,12 +135,6 @@ MSAL_CLIENT_ID = 'your_client_id'
 MSAL_AUTHORITY = 'https://login.microsoftonline.com/your_tenant_id'
 
 # Configure Django Rest Framework settings for authentication
-
-# Configure Django Rest Framework settings for authentication
-# Assuming environment variables are used to configure these settings
-CLIENT_ID = os.getenv('VITE_CLIENT_ID', '2bfabdcd-f00a-4f27-93e7-2986aa3dbe40')
-TENANT_ID = 'dilipku007gmail.onmicrosoft.com'
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -148,31 +142,6 @@ REST_FRAMEWORK = {
 
 }
 
-
-""" REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-
-} """
-# Configure SIMPLE_JWT as needed for your Azure AD integration
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-
-    'ALGORITHM': 'RS256',
-    'SIGNING_KEY': None,  # Signing key is not used for RS256 (asymmetric) algorithm
-    'VERIFYING_KEY': None,  # You must fetch the public key from Azure AD and set it here or in your token validation logic
-    'AUDIENCE': CLIENT_ID,
-    'ISSUER': f'https://login.microsoftonline.com/{TENANT_ID}/v2.0',
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'sub',
-    'USER_ID_CLAIM': 'sub',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-}
 # cors-configuration
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -222,7 +191,7 @@ SWAGGER_SETTINGS = {
         'delete'
     ],
     "api_key": '',
-    "is_authenticated": False,
+    "is_authenticated": True,
     "is_superuser": False,
 
     'SECURITY_DEFINITIONS': {
@@ -235,6 +204,11 @@ SWAGGER_SETTINGS = {
 }
 
 
+# custom authentication backend
+AUTHENTICATION_CLASSES = [
+    'account.backends.AzureADAuthentication',
+]
+
 # CELERY SETUP
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
@@ -245,9 +219,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 #CELERY_TASK_RESULT_EXPIRES = 60 * 60 * 24  # 1 day
 CELERY_TIMEZONE = 'UTC'
 CELERY_ENABLE_UTC = True
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 

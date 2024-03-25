@@ -14,10 +14,11 @@ def listing_construct_payload(request):
     order = request.GET.get('order', 'DESC')  # Default value: 'DESC'
     #issuetype = request.GET.get('issuetype', 'Tasks')  # Default value: 'Sub-task, Task'
     #issuetype = request.GET.get('issuetype', 'Sub-task, Tasks')  # Default value: 'Sub-task, Task'
-    issuekey = request.GET.get('issuekey', '')  # Filter by Issue Key
+    issuekey = request.GET.get('jiraId', '')  # Filter by Issue Key
     status = request.GET.get('status', "('Awaiting Customer', 'In Process', 'In Review', 'Not Started')")  # Default value for status
     parent_key = request.GET.get('parent_key', '')  # Filter by parent Key
     activity_key_field = request.GET.get('activity_shname', 'True') # for activity short name customfield_16036
+    assignee_email = request.GET.get('expertEmail', '') # for activity short name customfield_16036
 
     jql_parts = []
 
@@ -47,8 +48,12 @@ def listing_construct_payload(request):
         jql_parts.append(f"cf[16036] IS NOT EMPTY")
 
     jql_parts.append("'Service Category[Dropdown]' = 'Expert Services'")
-    jql_parts.append("assignee NOT in (EMPTY)")
-    # for activity short name filter 
+    
+    if assignee_email:
+        jql_parts.append(f"assignee in ({assignee_email})") 
+    else:
+        jql_parts.append("assignee NOT in (EMPTY)")
+        
     #jql_parts.append("customfield_16036 NOT in (EMPTY)")
 
     # Joining all JQL parts with AND and adding order by clause
@@ -69,6 +74,5 @@ def listing_construct_payload(request):
         "startAt": startAt
     }
 
-    print("payload--->",payload)
 
     return payload
