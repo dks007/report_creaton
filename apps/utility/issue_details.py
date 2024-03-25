@@ -43,7 +43,6 @@ def issue_details_data(request,id):
     )
 
     json_file_path = "E:/IFS_BACKEND/success_tool_backend_local/report_creaton/apps/utility/singledata.json"
-    # Open the file in read mode
     with open(json_file_path, "r", encoding='utf-8') as json_file:
         data = json.load(json_file) 
 

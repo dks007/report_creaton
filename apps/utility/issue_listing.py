@@ -14,8 +14,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "success_tool.settings")
 django.setup()
 
 def issue_list_data(request):
-
+    print("request listing-->",request)
     payload = listing_construct_payload(request)
+    print("payload-->",payload)
     url = os.getenv('JIRA_URL')
     response = requests.post(url, headers=headers, auth=auth, data=json.dumps(payload), verify=True)
     data_list = []
@@ -84,14 +85,16 @@ def issue_list_data(request):
             customer_id = project_key[2:]
             subtask = issue["fields"]["issuetype"].get("subtask", "")
             assignee_name = issue["fields"]["assignee"].get("displayName", "") if "assignee" in issue["fields"] else None
+            assignee_email = issue["fields"]["assignee"].get("emailAddress", "") if "assignee" in issue[
+            "fields"] else None
             
             issue_fields = {
                 "issue_key": issue_key,
                 "issue_summary": issue_summary,
-                "menu_card": menu_card,
                 "customer_id": customer_id,
                 "subtasks_list": subtasks_list,
                 "partner": partner,
+                "menu_card":menu_card,
                 "subtask": subtask,
                 "project_id": project_id,
                 "project_key": project_key,
@@ -101,7 +104,8 @@ def issue_list_data(request):
                 "assign_date": changelog_assignee_created if changelog_assignee_created else None,
                 "parent_id": parent_id,
                 "parent_key": parent_key,
-                "assignee_name": assignee_name
+                "assignee_name": assignee_name,
+                "assignee_email":assignee_email
             }
 
             data_list.append(issue_fields)
@@ -122,15 +126,22 @@ def issue_list_data(request):
                 dt['report_status'] = str(report_data.report_status.id)
                 dt['report_error'] = report_data.error_msg
                 dt['download_link'] = report_data.download_link
+                dt['customer_name'] = report_data.customer.customer_name if report_data.customer else ''
+                dt['menu_card'] = report_data.menu_card.menu_card if report_data.menu_card else ''
             else:
                 dt['report_status'] = '1'
 
-            if menu_card_data is not None:
-                dt['menu_description'] = menu_card_data.menu_description
+                if menu_card_data is not None:
+                    dt['menu_description'] = menu_card_data.menu_description
+                    
+                if customer_map:
+                    dt['customer_name'] = customer_map.customer.customer_name if customer_map.customer else ''
+                    
             if customer_map:
                 dt['csm_name'] = customer_map.csm.csm_name if customer_map.csm else ''
                 dt['sdm_name'] = customer_map.sdm.sdm_name if customer_map.sdm else ''
                 dt['psm_name'] = customer_map.psm.psm_name if customer_map.psm else ''
+                #print("customer_map.psm.psm_name-->",customer_map.psm.psm_name)
 
         return data_list, total_records
     else:

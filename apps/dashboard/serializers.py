@@ -68,7 +68,7 @@ class ExpertSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = ExpertMaster
-        fields = ['id', 'expert_name']
+        fields = ['id', 'expert_name','expert_email']
         #fields = ('expert_name',)
 
 class MenuCardSerializer(serializers.ModelSerializer):

@@ -125,8 +125,28 @@ def extract_subtasks_data(subtasks):
     else:
         return []
 
-# getting menu card and partner by given string
 def find_menuid_in_string(match_str, menuList):
+    if match_str:
+        match_str = match_str.strip()  # Trim leading and trailing whitespace
+        match = re.search(r'(EMA|SAA|QSM|TAA)(0*\d+)(P?)', match_str)
+        if match:
+            menu_prefix = match.group(1)
+            menu_number = match.group(2)
+            is_partner = match.group(3) == 'P'
+            menu_id_with_zeros = menu_prefix + menu_number.zfill(2)  # Add leading zeros if necessary
+            menu_card = ""
+
+            if is_partner and menu_id_with_zeros + 'P' in menuList:
+                menu_card = menuList[menuList.index(menu_id_with_zeros + 'P')]
+            elif menu_id_with_zeros in menuList:
+                menu_card = menuList[menuList.index(menu_id_with_zeros)]
+            return menu_card, is_partner
+        else:
+            return None, False
+    return None, False
+
+# getting menu card and partner by given string
+def find_menuid_in_string_old(match_str, menuList):
     if match_str:
         match_str = match_str.strip()  # Trim leading and trailing whitespace
         match = re.search(r'(QSM|SAA|EMA|TAA)(0*\d+)P?', match_str)
@@ -183,7 +203,6 @@ def getSuccessReportData(issueKey):
 # function to get sdm, csm, sdo , report status and error message 
 def getAdditionDataBKey(issue_data_dict):
         # Additional processing and enriching the issue_data_dict
-        print("issue_keyissue_key-->",issue_data_dict.get('issue_key'))
         report_data = SuccessReport.objects.filter(jira_key=issue_data_dict.get('issue_key')).first()
         menu_card_data = MenuCardMaster.objects.filter(menu_card=issue_data_dict.get('menu_card')).first()
         sdo_map = MenuSdoMapping.objects.filter(menu_card__menu_card=issue_data_dict.get('menu_card')).first()
@@ -231,6 +250,7 @@ def getAdditionDataBKey(issue_data_dict):
             issue_data_dict['product'] = report_data.product.product_name
             issue_data_dict['capability'] = report_data.capability.capability_name
             issue_data_dict['sub_capability'] = report_data.sub_capability.sub_capability_name
+            issue_data_dict['download_link'] = report_data.download_link
             #issue_data_dict['logo_file_name'] = report_data.logo.logo_file_name
             issue_data_dict['logo_url'] = logo_url
         else:
@@ -255,6 +275,9 @@ def getAdditionDataBKey(issue_data_dict):
             else:
                 issue_data_dict['csm_name']=''
                 issue_data_dict['sdm_name']=''
+                issue_data_dict['customer_name']=''
+                issue_data_dict['psm_name'] =''
+                issue_data_dict['logo_url']=''
 
             issue_data_dict['report_status'] = '1'
             issue_data_dict['report_error'] = ''

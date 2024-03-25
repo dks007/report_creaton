@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from apps.dashboard.views import (  MenuViewSet, ProjectViewSet, SubCapabilityViewSet,
                                   CapabilityViewSet, SuccessCreateReportViewSet, SuccessReportViewSet,
-                                   ListViewSet)
+                                   ListViewSet, ExpertViewSet)
 
 router = DefaultRouter()
 router.register('menu-card-list', MenuViewSet, basename='menu-card-list')
@@ -13,6 +13,7 @@ router.register('sub-capability', SubCapabilityViewSet, basename='sub-capability
 router.register('report', SuccessReportViewSet, basename='report')
 router.register('createreport', SuccessCreateReportViewSet, basename='createreport')
 router.register('', ListViewSet, basename='issue-list')
+router.register('expertlist', ExpertViewSet, basename='expertlist')
 # router.register('issue-list', IssueViewSet, basename='issue-list')
 
 urlpatterns = [

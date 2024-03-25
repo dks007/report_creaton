@@ -11,17 +11,17 @@ from rest_framework.response import Response
 from django.contrib.auth.decorators import permission_required
 
 # local import
-from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, CapabilitySerializer, \
+from apps.dashboard.serializers import MenuListSerializer, ProjectSerializer, ExpertSerializer,CapabilitySerializer, \
     SubCapabilitySerializer, SuccessReportSerializer, SuccessCreateReportSerializer
 from ..accounts.permissions import IFSPermission
-from ..utility.create_success_report import success_report, convert_json, all_master_list, upload_logo_image
+from ..utility.create_success_report import success_report, all_master_list, upload_logo_image
 from ..utility.get_create_report import jiradata_create_report
 from ..utility.issue_listing import issue_list_data
 
 from ..utility.subtask_listing import subtask_list_data
 from ..utility.issue_details import issue_details_data
 from apps.dashboard.models.masters import (MenuCardMaster, ProjectMaster, CapabilityMaster, SubCapabilityMaster,
-                                           SDMMaster, SdoMaster, CSMMaster)
+                                           SDMMaster, SdoMaster, CSMMaster, ExpertMaster)
 from apps.dashboard.models.models import SuccessReport
 
 
@@ -51,9 +51,7 @@ class ListViewSet(viewsets.GenericViewSet):
     @action(methods=['get'], detail=False, url_path='get-createreport/(?P<id>[^/.]+)', url_name='get-createreport')
     def get_create_report(self, request, id):
         try:
-            print("view iddddd->",id)
             report = SuccessReport.objects.filter(jira_key=id).first()
-            print("view report->",report)
             menu_card, product, capsubcap, customer_contact, customer = all_master_list()
             if not report:
                 # Creating a new report
@@ -64,7 +62,6 @@ class ListViewSet(viewsets.GenericViewSet):
                 report_data['customer_contact_list'] = customer_contact[0]
                 report_data['customer_list'] = customer[0]
             else:
-                print("view else from db -->")
                 report_data = {
                     "issue_key": report.jira_key,
                     "menu_card": report.menu_card.menu_card if report.menu_card else "",
@@ -122,6 +119,22 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectMaster.objects.all()
     serializer_class = ProjectSerializer
+    #permission_classes = [IFSPermission]
+
+    def list(self, request, *args, **kwargs):
+        """
+        get project list
+        """
+        queryset = self.get_queryset()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response({'resdata': serializer.data, 'status': status.HTTP_200_OK})
+    
+class ExpertViewSet(viewsets.ModelViewSet):
+    """
+    project view set, used to get project list
+    """
+    queryset = ExpertMaster.objects.all()
+    serializer_class = ExpertSerializer
     #permission_classes = [IFSPermission]
 
     def list(self, request, *args, **kwargs):

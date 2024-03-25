@@ -78,12 +78,12 @@ def success_report(data: dict):
     if not logo_url and not existing_logo_url =="":
        return "Please enter logo url"  
 
-    # Check if the incoming logo_url is different from the existing logo_url in LogoMaster
+    """ # Check if the incoming logo_url is different from the existing logo_url in LogoMaster
     if logo_url and logo_url != existing_logo_url:
         logo_url = logo_url
     else:
         logo_url =""
-
+ """
     #getting logo id for save according to customer selection
     logo=None
     if customer_map and customer_map.logo:
@@ -145,7 +145,7 @@ def success_report(data: dict):
 
 
 
-def convert_json(response):
+""" def convert_json(response):
     response = {
         "issue_key": response.jira_key,
         "menu_card": response.menu_card.menu_card,
@@ -157,7 +157,7 @@ def convert_json(response):
         "report_status": response.report_status.report_status_name
     }
 
-    return response
+    return response """
 
 
 # Getting all require master data list
